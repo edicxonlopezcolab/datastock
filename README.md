@@ -10,7 +10,7 @@
 | Requisito | Descripción | Estado |
 |---|---|---|
 | RF-FIC-01 | Explorar rutas, ficheros y directorios | ✅ Completado |
-| RF-FIC-02 | Importar catálogo JSON | ⏳ Pendiente |
+| RF-FIC-02 | Importar catálogo JSON | 🔧 En desarrollo |
 | RF-FIC-03 | Importar catálogo XML (DOM) | ⏳ Pendiente |
 | RF-FIC-04 | Consultar y buscar productos | ⏳ Pendiente |
 | RF-FIC-05 | Exportar a JSON y XML | ⏳ Pendiente |
@@ -28,6 +28,15 @@ y sus salidas se guardan en `evidencias/`.
 - **RF-FIC-01:** `ExploradorRutas` usa la API NIO (`Path`, `Files`).
   `Files.list` se abre con try-with-resources. Se controlan por separado
   las rutas vacías, inexistentes, con caracteres no válidos y sin permisos.
+
+  - **Validación común (RF-FIC-02 y RF-FIC-03):** `ValidadorProducto` recibe los
+  seis campos como texto y aplica las reglas de la sección 6 del enunciado.
+  Los dos importadores usan la misma clase, por lo que JSON y XML validan
+  exactamente igual. `validar()` acumula todos los errores de un producto;
+  `crear()` solo se llama cuando no hay errores.
+- **Normalización de códigos:** se eliminan los espacios extremos y se pasan
+  a mayúsculas antes de validar y de comparar duplicados. Así `tec-001` se
+  acepta como `TEC-001`, coherente con que la unicidad no distinga mayúsculas.
 
 ## 1. ¿Qué es este proyecto?
 
@@ -90,6 +99,8 @@ DataStock_UT1_Proyecto_Inicial/
     │   └── Inventario.java    # Colección compartida en memoria
     ├── ficheros/
     │   └── ExploradorRutas.java   # RF-FIC-01
+    ├── validacion/
+    │   └── ValidadorProducto.java # Reglas comunes JSON/XML
     ├── ui/
     │   └── MenuPrincipal.java # Menú principal y submenús
     ├── util/
