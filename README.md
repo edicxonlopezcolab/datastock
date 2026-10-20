@@ -3,6 +3,32 @@
 **Módulo:** Acceso a Datos · 2.º DAM · IES Isidra de Guzmán · Curso 2026–2027  
 **Lenguaje:** Java 21 · **Construcción:** Maven · **Interfaz:** consola
 
+**Autor:** Gabriel López · [GitHub](https://github.com/edicxonlopezcolab)
+
+## Estado del desarrollo
+
+| Requisito | Descripción | Estado |
+|---|---|---|
+| RF-FIC-01 | Explorar rutas, ficheros y directorios | ✅ Completado |
+| RF-FIC-02 | Importar catálogo JSON | ⏳ Pendiente |
+| RF-FIC-03 | Importar catálogo XML (DOM) | ⏳ Pendiente |
+| RF-FIC-04 | Consultar y buscar productos | ⏳ Pendiente |
+| RF-FIC-05 | Exportar a JSON y XML | ⏳ Pendiente |
+| RF-FIC-06 | Serialización del inventario | ⏳ Pendiente |
+| RF-FIC-07 | Consultas XPath (independiente) | ⏳ Pendiente |
+| RF-FIC-08 | Acceso aleatorio (independiente) | ⏳ Pendiente |
+
+Las pruebas ejecutadas se documentan en `docs/DataStock_UT1_Registro_Pruebas.docx`
+y sus salidas se guardan en `evidencias/`.
+
+## Decisiones de diseño
+
+- **Separación menú / lógica:** `MenuPrincipal` solo pide datos y delega.
+  Las operaciones con ficheros están en el paquete `ficheros`.
+- **RF-FIC-01:** `ExploradorRutas` usa la API NIO (`Path`, `Files`).
+  `Files.list` se abre con try-with-resources. Se controlan por separado
+  las rutas vacías, inexistentes, con caracteres no válidos y sin permisos.
+
 ## 1. ¿Qué es este proyecto?
 
 DataStock es una práctica **individual e integradora** que evolucionará durante tres unidades:
@@ -11,7 +37,7 @@ DataStock es una práctica **individual e integradora** que evolucionará durant
 - **UT2 – JDBC:** incorporar MySQL, operaciones SQL y transacciones.
 - **UT3 – Componentes:** reorganizar el acceso a datos en componentes reutilizables.
 
-**Esta entrega inicial solo prepara la UT1.** El código entregado **no resuelve** los requisitos funcionales: los menús muestran mensajes `[PENDIENTE]` hasta que se implementen.
+**Esta fase corresponde a la UT1.** Los requisitos se implementan de forma progresiva; su estado se indica en la tabla Estado del desarrollo. Las opciones aún no implementadas muestran [PENDIENTE].
 
 ## 2. Requisitos previos
 
@@ -48,7 +74,10 @@ DataStock_UT1_Proyecto_Inicial/
 ├── .gitignore
 ├── datos/
 │   ├── ejemplos/              # JSON/XML para comenzar las pruebas
+│   ├── pruebas/               # Ficheros de prueba propios (rf01, ...)
 │   └── salidas/               # Exportaciones y binarios generados
+├── docs/                      # Registro de pruebas
+├── evidencias/                # Salidas de cada prueba ejecutada
 ├── material_referencia/       # Modelo relacional y script SQL para UT2
 └── src/main/java/es/iesisidra/datastock/
     ├── App.java               # Punto de entrada
@@ -59,6 +88,8 @@ DataStock_UT1_Proyecto_Inicial/
     │   └── MovimientoStock.java
     ├── servicio/
     │   └── Inventario.java    # Colección compartida en memoria
+    ├── ficheros/
+    │   └── ExploradorRutas.java   # RF-FIC-01
     ├── ui/
     │   └── MenuPrincipal.java # Menú principal y submenús
     ├── util/
