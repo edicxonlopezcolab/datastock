@@ -1,0 +1,3 @@
+﻿---------- EXPLORAR RUTA ----------
+Digite la Ruta: C:\System Volume Information
+Error: No tienes permisos para acceder a este directorio.

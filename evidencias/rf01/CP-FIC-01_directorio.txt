@@ -1,0 +1,7 @@
+﻿---------- EXPLORAR RUTA ----------
+Digite la Ruta: datos/pruebas/rf01
+[DIR] antiguos
+[FICHERO] fichero1.txt (35 bytes)
+[FICHERO] fichero2.txt (35 bytes)
+----------------------------------------
+Total ficheros: 2 | Directorios: 1

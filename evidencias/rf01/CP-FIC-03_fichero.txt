@@ -1,0 +1,6 @@
+﻿---------- EXPLORAR RUTA ----------
+Digite la Ruta: pom.xml
+----- Información Fichero -----
+Nombre: pom.xml
+Ruta Absoluta: C:\Users\User\Documents\wsfp_egld\2\acceso_datos\DataStock_UT1_Proyecto_Inicial\pom.xml
+Tamaño: 1297 bytes

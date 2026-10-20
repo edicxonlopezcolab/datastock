@@ -1,0 +1,3 @@
+﻿---------- EXPLORAR RUTA ----------
+Digite la Ruta: datos/no_existe
+La ruta no existe: C:\Users\User\Documents\wsfp_egld\2\acceso_datos\DataStock_UT1_Proyecto_Inicial\datos\no_existe
