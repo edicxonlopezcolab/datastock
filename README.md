@@ -96,7 +96,7 @@ DataStock_UT1_Proyecto_Inicial/
     │   ├── Proveedor.java
     │   └── MovimientoStock.java
     ├── servicio/
-    │   └── Inventario.java    # Colección compartida en memoria
+    │   └── Inventario.java    # Colección compartida; altas sin duplicados
     ├── ficheros/
     │   └── ExploradorRutas.java   # RF-FIC-01
     ├── validacion/
