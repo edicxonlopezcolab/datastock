@@ -4,6 +4,8 @@ import es.iesisidra.datastock.servicio.Inventario;
 import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.LectorConsola;
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
+import es.iesisidra.datastock.ficheros.ImportadorJson;
+import es.iesisidra.datastock.servicio.ResultadoImportacion;
 
 /**
  * Presentación de menús y navegación de la primera fase de DataStock.
@@ -14,6 +16,7 @@ import es.iesisidra.datastock.ficheros.ExploradorRutas;
 public class MenuPrincipal {
     private final Inventario inventario;
     private final ExploradorRutas explorador = new ExploradorRutas();
+    private final ImportadorJson importadorJson = new ImportadorJson();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -33,7 +36,7 @@ public class MenuPrincipal {
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 6);
             switch (opcion) {
                 case 1 -> explorarRuta();
-                case 2 -> pendiente("RF-FIC-02 · Importar productos desde JSON");
+                case 2 -> importarJson() ;
                 case 3 -> pendiente("RF-FIC-03 · Importar productos desde XML");
                 case 4 -> menuConsultas();
                 case 5 -> menuExportaciones();
@@ -118,6 +121,38 @@ public class MenuPrincipal {
         String texto = LectorConsola.leerTexto("Digite la Ruta: ");
         explorador.explorar(texto);
         LectorConsola.pausar();
+    }
 
+    private void importarJson() 
+    {
+        System.out.println("\n---------- IMPORTAR JSON ----------");
+        String texto = LectorConsola.leerTexto("Digite la Ruta: ");
+        ResultadoImportacion resultado = importadorJson.importar(texto, inventario);
+        
+
+        if (resultado.hayErrorGeneral()) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + resultado.getErrorGeneral(), ColoresConsola.ROJO));
+        } 
+        else 
+        {
+
+            System.out.println("Encontrados: " + resultado.getEncontrados());
+            System.out.println("Importados: " + resultado.getImportados());
+            System.out.println("Rechazados: " + resultado.getRechazados());
+            
+
+            if (!resultado.getIncidencias().isEmpty()) 
+            {
+                System.out.println("Detalle de incidencias:");
+                for (String incidencia : resultado.getIncidencias()) 
+                {
+                    System.out.println("  - " + incidencia);
+                }
+            }
+            System.out.println(ColoresConsola.pintar("[OK] Importación finalizada.", ColoresConsola.VERDE)); 
+        }
+        LectorConsola.pausar();
     }
 }
+
