@@ -1,0 +1,83 @@
+{
+    "productos": [
+        {
+            "codigo": "",
+            "nombre": "Código vacío",
+            "precio": 1,
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "ABCDEFGHIJKLM",
+            "nombre": "Código de 13",
+            "precio": 1,
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "TEC 001",
+            "nombre": "Código con espacio",
+            "precio": 1,
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "NOM-001",
+            "nombre": "TV",
+            "precio": 1,
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "PRE-001",
+            "nombre": "Precio cero",
+            "precio": 0,
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "PRE-002",
+            "nombre": "Precio texto",
+            "precio": "abc",
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "PRE-003",
+            "nombre": "Tres decimales",
+            "precio": 12.345,
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "STK-001",
+            "nombre": "Stock negativo",
+            "precio": 1,
+            "stock": -1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "CAT-001",
+            "nombre": "Categoría cero",
+            "precio": 1,
+            "stock": 1,
+            "categoriaId": 0,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "PRV-001",
+            "nombre": "Sin proveedor",
+            "precio": 1,
+            "stock": 1,
+            "categoriaId": 1
+        }
+    ]
+}

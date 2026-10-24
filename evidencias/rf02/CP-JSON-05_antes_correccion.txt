@@ -1,0 +1,17 @@
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/reglas_validacion.json
+Encontrados: 10
+Importados: 0
+Rechazados: 10
+Detalle de incidencias:
+  - Producto 1 (): el código es obligatorio
+  - Producto 2 (ABCDEFGHIJKLM): el código no puede superar 12 caracteres
+  - Producto 3 (TEC 001): el código solo admite mayúsculas, números y guiones
+  - Producto 4 (NOM-001): el nombre debe tener entre 3 y 100 caracteres
+  - Producto 5 (PRE-001): el precio debe ser mayor que 0
+  - Producto 6 (PRE-002): el precio no es un número válido: abc
+  - Producto 7 (PRE-003): el precio admite como máximo dos decimales
+  - Producto 8 (STK-001): stock debe ser mayor o igual a 0
+  - Producto 9 (CAT-001): categoriaId debe ser mayor o igual a 1
+  - Producto 10 (PRV-001): proveedorId es obligatorio
+[OK] Importación finalizada.

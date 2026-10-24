@@ -1,0 +1,28 @@
+{
+    "productos": [
+        {
+            "codigo": "MON-010",
+            "nombre": "Monitor 27 pulgadas",
+            "precio": 219.90,
+            "stock": 5,
+            "categoriaId": 2,
+            "proveedorId": 2
+        },
+        {
+            "codigo": "ALT-011",
+            "nombre": "Altavoces estéreo",
+            "precio": 34.50,
+            "stock": 14,
+            "categoriaId": 3,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "web-012",
+            "nombre": "Webcam HD",
+            "precio": 29.99,
+            "stock": 9,
+            "categoriaId": 1,
+            "proveedorId": 3
+        }
+    ]
+}

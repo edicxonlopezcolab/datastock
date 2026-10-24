@@ -1,0 +1,6 @@
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/tres_validos.json
+Encontrados: 3
+Importados: 3
+Rechazados: 0
+[OK] Importación finalizada.

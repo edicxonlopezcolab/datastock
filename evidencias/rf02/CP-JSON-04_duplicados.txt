@@ -1,0 +1,10 @@
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/tres_validos.json
+Encontrados: 3
+Importados: 0
+Rechazados: 3
+Detalle de incidencias:
+  - MON-010: ya existe en el inventario
+  - ALT-011: ya existe en el inventario
+  - WEB-012: ya existe en el inventario
+[OK] Importación finalizada.

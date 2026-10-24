@@ -1,0 +1,3 @@
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/sin_array.json
+[ERROR] falta el array productos

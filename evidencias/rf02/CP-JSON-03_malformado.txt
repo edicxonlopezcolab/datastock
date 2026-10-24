@@ -1,0 +1,7 @@
+Productos en memoria: 6
+
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/ejemplos/catalogo_malformado.json
+[ERROR] el fichero contiene un JSON mal formado
+
+Productos en memoria: 6

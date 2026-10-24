@@ -6,7 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.io.Reader;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,12 +17,26 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonArray;
 
+import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.servicio.Inventario;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 import es.iesisidra.datastock.validacion.ValidadorProducto;
 
+/**
+ * Importa productos desde un catálogo JSON (RF-FIC-02).
+ * <p>No imprime nada por consola: devuelve un {@link ResultadoImportacion}
+ * que el menú se encarga de mostrar.</p>
+ */
 public class ImportadorJson {
 
+    /**
+     * Lee el fichero, valida cada producto y añade los válidos al inventario.
+     * Si el documento no puede interpretarse, no se modifica el inventario.
+     * @param textoRuta ruta del fichero JSON escrita por el usuario
+     * @param inventario inventario común donde se añaden los productos
+     * @return resumen con encontrados, importados, rechazados e incidencias,
+     *         o un error general si el documento no es válido
+     */
     public ResultadoImportacion importar(String textoRuta, Inventario inventario) 
     {
 
@@ -77,6 +94,8 @@ public class ImportadorJson {
             JsonArray array = objeto.get("productos").getAsJsonArray();
 
             int posicion = 0;
+            List<Producto> validos = new ArrayList<>();
+            Set<String> codigosVistos = new HashSet<>();
             for (JsonElement elemento : array) 
             {
                 posicion++;
@@ -97,12 +116,43 @@ public class ImportadorJson {
                     String proveedorId = leerCampo(producto, "proveedorId");
                     List<String> errores = validador.validar(codigo, nombre, precio, stock, categoriaId, proveedorId);
 
+                    String codigoMostrar;
+                    if (codigo != null && !codigo.trim().isEmpty()) 
+                    {
+                        codigoMostrar = codigo;
+                    } 
+                    else 
+                    {
+                        codigoMostrar = "sin código";
+                    }                                
                     if (!errores.isEmpty()) 
                     {
-                        resultado.agregarIncidencia("Producto " + posicion + " (" + codigo + "): " + String.join("; ", errores));
+                        resultado.agregarIncidencia("Producto " + posicion + " (" + codigoMostrar + "): " + String.join("; ", errores));
+                    }
+                    else
+                    {
+                        String codigoNormalizado = ValidadorProducto.normalizarCodigo(codigo);
+                        if (!codigosVistos.add(codigoNormalizado)) 
+                        {
+                            resultado.agregarIncidencia("Producto " + posicion + " (" + codigoMostrar + "): código repetido en el fichero");
+                        } 
+                        else 
+                        {
+                            validos.add(validador.crear(codigo, nombre, precio, stock, categoriaId, proveedorId));
+                        }
                     }
                 }
-
+            }
+            for(Producto producto : validos)
+            {
+                if (inventario.agregar(producto)) 
+                {
+                    resultado.sumarImportado();
+                } 
+                else 
+                {
+                    resultado.agregarIncidencia(producto.getCodigo() + ": ya existe en el inventario");
+                }
             }
         }
         catch (JsonParseException e)

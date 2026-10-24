@@ -1,0 +1,9 @@
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/tres_validos_dos_invalidos.json
+Encontrados: 5
+Importados: 3
+Rechazados: 2
+Detalle de incidencias:
+  - Producto 2 (SSD-021): el precio debe ser mayor que 0
+  - Producto 4 (sin código): el código es obligatorio
+[OK] Importación finalizada.

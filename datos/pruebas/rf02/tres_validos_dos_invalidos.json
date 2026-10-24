@@ -1,0 +1,43 @@
+{
+    "productos": [
+        {
+            "codigo": "HDD-020",
+            "nombre": "Disco duro 1TB",
+            "precio": 49.90,
+            "stock": 7,
+            "categoriaId": 4,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "SSD-021",
+            "nombre": "SSD 512GB",
+            "precio": -10,
+            "stock": 3,
+            "categoriaId": 4,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "RAM-022",
+            "nombre": "Memoria RAM 16GB",
+            "precio": 39.95,
+            "stock": 11,
+            "categoriaId": 4,
+            "proveedorId": 2
+        },
+        {
+            "nombre": "Producto sin código",
+            "precio": 5,
+            "stock": 1,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "USB-024",
+            "nombre": "Hub USB",
+            "precio": 12.00,
+            "stock": 20,
+            "categoriaId": 1,
+            "proveedorId": 1
+        }
+    ]
+}
