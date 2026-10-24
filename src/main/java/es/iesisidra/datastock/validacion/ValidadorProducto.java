@@ -85,6 +85,10 @@ public class ValidadorProducto
                 {
                     errores.add("el precio debe ser mayor que 0");
                 }
+                else if (precioNormalizado.scale() > 2)
+                {
+                    errores.add("el precio admite como máximo dos decimales");
+                }
             }
             catch (NumberFormatException e)
             {

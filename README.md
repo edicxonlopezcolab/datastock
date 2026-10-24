@@ -33,10 +33,18 @@ y sus salidas se guardan en `evidencias/`.
   seis campos como texto y aplica las reglas de la sección 6 del enunciado.
   Los dos importadores usan la misma clase, por lo que JSON y XML validan
   exactamente igual. `validar()` acumula todos los errores de un producto;
+
   `crear()` solo se llama cuando no hay errores.
 - **Normalización de códigos:** se eliminan los espacios extremos y se pasan
   a mayúsculas antes de validar y de comparar duplicados. Así `tec-001` se
   acepta como `TEC-001`, coherente con que la unicidad no distinga mayúsculas.
+
+  - **Resultado de importación:** los importadores no imprimen nada; devuelven un
+  `ResultadoImportacion` con encontrados, importados, rechazados e incidencias,
+  o un error general si el documento no puede procesarse. El menú se encarga
+  de mostrarlo. Así la lectura de ficheros queda separada de la consola.
+- **Precio con dos decimales como máximo:** se valida ya en UT1, coherente con
+  el tipo `DECIMAL(10,2)` que tendrá en MySQL.
 
 ## 1. ¿Qué es este proyecto?
 
@@ -97,6 +105,7 @@ DataStock_UT1_Proyecto_Inicial/
     │   └── MovimientoStock.java
     ├── servicio/
     │   └── Inventario.java    # Colección compartida; altas sin duplicados
+    │   └── ResultadoImportacion.java  # Resumen de cada importación
     ├── ficheros/
     │   └── ExploradorRutas.java   # RF-FIC-01
     ├── validacion/
