@@ -3,8 +3,12 @@ package es.iesisidra.datastock.ui;
 import es.iesisidra.datastock.servicio.Inventario;
 import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.LectorConsola;
+
+import java.util.List;
+
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
 import es.iesisidra.datastock.ficheros.ImportadorJson;
+import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 
 /**
@@ -65,9 +69,9 @@ public class MenuPrincipal {
             System.out.println("0. Volver al menú principal");
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 3);
             switch (opcion) {
-                case 1 -> pendiente("RF-FIC-04 · Listar productos");
-                case 2 -> pendiente("RF-FIC-04 · Buscar por código");
-                case 3 -> pendiente("RF-FIC-04 · Buscar por nombre");
+                case 1 -> listarProductos();
+                case 2 -> buscarProductoPorCodigo();
+                case 3 -> buscarProductosPorNombre();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -153,6 +157,94 @@ public class MenuPrincipal {
             System.out.println(ColoresConsola.pintar("[OK] Importación finalizada.", ColoresConsola.VERDE)); 
         }
         LectorConsola.pausar();
+    }
+
+    private void mostrarProducto(Producto p) 
+    {
+        System.out.println("Código: " + p.getCodigo());
+        System.out.println("Nombre: " + p.getNombre());
+        System.out.println("Precio: " + p.getPrecio() + " € | Stock: " + p.getStock());
+        System.out.println("Categoría: " + p.getCategoriaId() + " | Proveedor: " + p.getProveedorId());
+    }
+
+    private void listarProductos() 
+    {
+        System.out.println("\n---------- LISTAR PRODUCTOS ----------");
+        List<Producto> productos = inventario.listarOrdenado();
+        
+        if (productos.isEmpty()) 
+        {
+            System.out.println("No hay productos en el inventario.");
+        } 
+        else 
+        {
+            mostrarLista(productos);
+        }
+        LectorConsola.pausar();
+    }
+
+    private void buscarProductoPorCodigo() 
+    {
+        System.out.println("\n---------- BUSCAR PRODUCTOS POR CÓDIGO ----------");
+        String codigo = LectorConsola.leerTexto("Introduce el código del producto: ").trim();
+
+        if (codigo.isEmpty()) 
+        {
+            System.out.println("El código no puede estar vacío.");
+        } 
+        else 
+        {
+            Producto p = inventario.buscarPorCodigo(codigo);
+            if (p == null) 
+            {
+                System.out.println("No existe ningún producto con ese código.");
+            } 
+            else 
+            {
+                mostrarProducto(p);
+            }
+        }
+        LectorConsola.pausar();
+    }
+
+    private void buscarProductosPorNombre() 
+    {
+        System.out.println("\n---------- BUSCAR PRODUCTOS POR NOMBRE ----------");
+        String texto = LectorConsola.leerTexto("Introduce el texto a buscar en el nombre: ").trim();
+
+        if (texto.isEmpty()) 
+        {
+            System.out.println("El texto no puede estar vacío.");
+        } 
+        else 
+        {
+            List<Producto> resultados = inventario.buscarPorNombre(texto);
+            
+            if (resultados.isEmpty()) 
+            {
+                System.out.println("No hay coincidencias.");
+            } 
+            else 
+            {
+                mostrarLista(resultados);
+            }
+        }
+        LectorConsola.pausar();
+    }
+
+    private void mostrarLista(List<Producto> lista) 
+    {
+        boolean primero = true;
+        for (Producto p : lista) 
+        {
+            if (!primero) 
+            {
+                System.out.println("----------------------------------------");
+            }
+            mostrarProducto(p);
+            primero = false;
+        }
+        System.out.println("\nTotal: " + lista.size() + " productos");
     }
 }
 

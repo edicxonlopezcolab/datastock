@@ -12,7 +12,7 @@
 | RF-FIC-01 | Explorar rutas, ficheros y directorios | ✅ Completado |
 | RF-FIC-02 | Importar catálogo JSON | ✅ Completado |
 | RF-FIC-03 | Importar catálogo XML (DOM) | ⏳ Pendiente |
-| RF-FIC-04 | Consultar y buscar productos | ⏳ Pendiente |
+| RF-FIC-04 | Consultar y buscar productos | ✅ Completado |
 | RF-FIC-05 | Exportar a JSON y XML | ⏳ Pendiente |
 | RF-FIC-06 | Serialización del inventario | ⏳ Pendiente |
 | RF-FIC-07 | Consultas XPath (independiente) | ⏳ Pendiente |
@@ -48,6 +48,13 @@ y sus salidas se guardan en `evidencias/`.
   una lista temporal y solo al final se añaden al inventario. Los códigos
   repetidos dentro del mismo fichero se detectan con un `Set`; los que ya
   existen en el inventario, con `Inventario.agregar()`.
+- **RF-FIC-04:** las búsquedas y el listado están en `Inventario`, que devuelve
+  resultados sin imprimir. `listarOrdenado()` ordena una **copia** con
+  `Comparator.comparing(Producto::getCodigo)`, de modo que consultar no altera
+  la colección. El menú muestra los resultados con un único método auxiliar.
+- **Consola de Windows:** para ver correctamente el símbolo € hay que ejecutar
+  `chcp 65001` y después `mvn exec:java` en la misma terminal. El botón Run
+  del IDE abre una terminal nueva que no conserva ese ajuste.
 
 ## 1. ¿Qué es este proyecto?
 
@@ -63,13 +70,13 @@ Esta fase corresponde a la UT1. Los requisitos se implementan de forma progresiv
 
 - JDK **21** instalado y seleccionado en el IDE (`java -version`).
 - Maven instalado, o un IDE con integración Maven.
-- Consola con UTF-8 para ver correctamente tildes y símbolos.
+- Consola con UTF-8 para ver tildes y el símbolo € (en Windows: `chcp 65001` antes de `mvn exec:java`).
 
 ## 3. Cómo abrir y ejecutar
 
 1. Clona el repositorio y abre **la carpeta que contiene `pom.xml`** como proyecto Maven en IntelliJ IDEA, Eclipse o VS Code.
 2. Espera a que Maven descargue la dependencia Gson (requiere conexión a Internet la primera vez).
-3. Ejecuta `es.iesisidra.datastock.App` desde el IDE, o en una terminal situada en la raíz:
+3. En una terminal situada en la raíz:
 
 ```bash
 mvn clean compile
@@ -107,7 +114,7 @@ DataStock_UT1_Proyecto_Inicial/
     │   ├── Proveedor.java
     │   └── MovimientoStock.java
     ├── servicio/
-    │   ├── Inventario.java            # Colección compartida; altas sin duplicados
+    │   ├── Inventario.java            # Colección compartida; altas sin duplicados y consultas
     │   └── ResultadoImportacion.java  # Resumen de cada importación
     ├── validacion/
     │   └── ValidadorProducto.java     # Reglas comunes JSON/XML
@@ -138,7 +145,7 @@ DataStock_UT1_Proyecto_Inicial/
 0. Salir
 ```
 
-**4. Consultar productos:** listar, buscar por código, buscar por nombre, volver.  
+**4. Consultar productos:** listar (ordenado por código), buscar por código, buscar por nombre, volver.  
 **5. Exportar productos:** exportar JSON, exportar XML, volver.  
 **6. Guardar y recuperar inventario:** guardar `.dat`, recuperar `.dat`, volver.
 

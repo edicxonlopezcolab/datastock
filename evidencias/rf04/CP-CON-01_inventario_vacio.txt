@@ -1,0 +1,3 @@
+---------- LISTAR PRODUCTOS ----------
+No hay productos en el inventario.
+Pulsa Intro para continuar...

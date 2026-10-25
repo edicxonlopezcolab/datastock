@@ -1,0 +1,4 @@
+---------- BUSCAR PRODUCTOS POR CÓDIGO ----------
+Introduce el código del producto: 
+El código no puede estar vacío.
+Pulsa Intro para continuar...

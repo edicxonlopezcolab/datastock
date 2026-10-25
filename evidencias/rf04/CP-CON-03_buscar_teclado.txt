@@ -1,0 +1,9 @@
+---------- BUSCAR PRODUCTOS POR NOMBRE ----------
+Introduce el texto a buscar en el nombre: teclado
+Código: TEC-001
+Nombre: Teclado USB
+Precio: 19.95 € | Stock: 12
+Categoría: 1 | Proveedor: 1
+
+Total: 1 productos
+Pulsa Intro para continuar...

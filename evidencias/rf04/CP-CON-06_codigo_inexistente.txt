@@ -1,0 +1,4 @@
+---------- BUSCAR PRODUCTOS POR CÓDIGO ----------
+Introduce el código del producto: XXX-999
+No existe ningún producto con ese código.
+Pulsa Intro para continuar...

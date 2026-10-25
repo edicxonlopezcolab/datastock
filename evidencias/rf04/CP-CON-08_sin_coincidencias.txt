@@ -1,0 +1,4 @@
+---------- BUSCAR PRODUCTOS POR NOMBRE ----------
+Introduce el texto a buscar en el nombre: impresora
+No hay coincidencias.
+Pulsa Intro para continuar...
