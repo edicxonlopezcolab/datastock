@@ -8,6 +8,7 @@ import java.util.List;
 
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
 import es.iesisidra.datastock.ficheros.ImportadorJson;
+import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 
@@ -21,6 +22,7 @@ public class MenuPrincipal {
     private final Inventario inventario;
     private final ExploradorRutas explorador = new ExploradorRutas();
     private final ImportadorJson importadorJson = new ImportadorJson();
+    private final ImportadorXml importadorXml = new ImportadorXml();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -41,7 +43,7 @@ public class MenuPrincipal {
             switch (opcion) {
                 case 1 -> explorarRuta();
                 case 2 -> importarJson() ;
-                case 3 -> pendiente("RF-FIC-03 · Importar productos desde XML");
+                case 3 -> importarXml();
                 case 4 -> menuConsultas();
                 case 5 -> menuExportaciones();
                 case 6 -> menuSerializacion();
@@ -132,6 +134,38 @@ public class MenuPrincipal {
         System.out.println("\n---------- IMPORTAR JSON ----------");
         String texto = LectorConsola.leerTexto("Digite la Ruta: ");
         ResultadoImportacion resultado = importadorJson.importar(texto, inventario);
+        
+
+        if (resultado.hayErrorGeneral()) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + resultado.getErrorGeneral(), ColoresConsola.ROJO));
+        } 
+        else 
+        {
+
+            System.out.println("Encontrados: " + resultado.getEncontrados());
+            System.out.println("Importados: " + resultado.getImportados());
+            System.out.println("Rechazados: " + resultado.getRechazados());
+            
+
+            if (!resultado.getIncidencias().isEmpty()) 
+            {
+                System.out.println("Detalle de incidencias:");
+                for (String incidencia : resultado.getIncidencias()) 
+                {
+                    System.out.println("  - " + incidencia);
+                }
+            }
+            System.out.println(ColoresConsola.pintar("[OK] Importación finalizada.", ColoresConsola.VERDE)); 
+        }
+        LectorConsola.pausar();
+    }
+
+    private void importarXml() 
+    {
+        System.out.println("\n---------- IMPORTAR XML ----------");
+        String texto = LectorConsola.leerTexto("Digite la Ruta: ");
+        ResultadoImportacion resultado = importadorXml.importar(texto, inventario);
         
 
         if (resultado.hayErrorGeneral()) 
