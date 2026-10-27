@@ -130,4 +130,15 @@ public class Inventario {
         copia.sort(Comparator.comparing(Producto::getCodigo));
         return copia;
     }
+
+    /**
+     * Sustituye todo el inventario por los productos indicados.
+     * Solo debe llamarse cuando la recuperación se ha completado correctamente.
+     * @param nuevos productos que pasan a formar el inventario
+     */
+    public void sustituir(List<Producto> nuevos)
+    {
+        productos.clear();
+        productos.addAll(nuevos);
+    }
 }

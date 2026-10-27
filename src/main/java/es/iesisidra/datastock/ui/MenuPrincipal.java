@@ -16,6 +16,7 @@ import es.iesisidra.datastock.ficheros.ExportadorJson;
 import es.iesisidra.datastock.ficheros.ExportadorXml;
 import es.iesisidra.datastock.ficheros.ImportadorJson;
 import es.iesisidra.datastock.ficheros.ImportadorXml;
+import es.iesisidra.datastock.ficheros.SerializadorInventario;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 
@@ -32,6 +33,7 @@ public class MenuPrincipal {
     private final ImportadorXml importadorXml = new ImportadorXml();
     private final ExportadorJson exportadorJson = new ExportadorJson();
     private final ExportadorXml exportadorXml = new ExportadorXml();
+    private final SerializadorInventario serializador = new SerializadorInventario();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -115,8 +117,8 @@ public class MenuPrincipal {
             System.out.println("0. Volver al menú principal");
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 2);
             switch (opcion) {
-                case 1 -> pendiente("RF-FIC-06 · Guardar inventario");
-                case 2 -> pendiente("RF-FIC-06 · Recuperar inventario");
+                case 1 -> guardarInventario();
+                case 2 -> recuperarInventario();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -301,7 +303,7 @@ public class MenuPrincipal {
             }
             if(!LectorConsola.confirmar("El fichero ya existe. ¿Sobrescribirlo?"))
             {
-                System.out.println(ColoresConsola.pintar("Exportación cancelada.", ColoresConsola.AMARILLO));
+                System.out.println(ColoresConsola.pintar("Operación cancelada.", ColoresConsola.AMARILLO));
                 return null;
             }    
         }
@@ -334,7 +336,7 @@ public class MenuPrincipal {
         }
         catch (IOException e)
         {
-            System.out.println(ColoresConsola.pintar("[ERROR] " + e.getMessage(), ColoresConsola.ROJO));
+            System.out.println(ColoresConsola.pintar("[ERROR] no se pudo recuperar el inventario: " + e.getMessage(), ColoresConsola.ROJO));
         }
         LectorConsola.pausar();
     }
@@ -367,6 +369,96 @@ public class MenuPrincipal {
         {
             System.out.println(ColoresConsola.pintar("[ERROR] " + e.getMessage(), ColoresConsola.ROJO));
         }
+        LectorConsola.pausar();
+    }
+
+    private void guardarInventario()
+    {
+        System.out.println("\n---------- GUARDAR INVENTARIO ----------");
+
+        if (inventario.getProductos().isEmpty())
+        {
+            System.out.println("No hay productos para guardar.");
+            LectorConsola.pausar();
+            return;
+        }
+
+        Path destino = pedirRutaDestino();
+        if (destino == null)
+        {
+            LectorConsola.pausar();
+            return;
+        }
+
+        try
+        {
+            int total = serializador.guardar(inventario.listarOrdenado(), destino);
+            System.out.println(ColoresConsola.pintar(
+                "[OK] " + total + " productos guardados en " + destino.toAbsolutePath(),
+                ColoresConsola.VERDE));
+        }
+        catch (IOException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + e.getMessage(), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void recuperarInventario()
+    {
+        System.out.println("\n---------- RECUPERAR INVENTARIO ----------");
+
+        String texto = LectorConsola.leerTexto("Ruta del fichero .dat: ");
+        if (texto == null || texto.trim().isEmpty())
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] la ruta está vacía", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+
+        Path origen;
+        try
+        {
+            origen = Paths.get(texto.trim());
+        }
+        catch (InvalidPathException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] la ruta no es válida", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+
+        if (!Files.exists(origen) || !Files.isRegularFile(origen))
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el fichero no existe o no es un fichero regular", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+
+        List<Producto> recuperados;
+        try
+        {
+            recuperados = serializador.recuperar(origen);
+        }
+        catch (IOException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] no se pudo recuperar el inventario: el fichero está dañado o no es un inventario de DataStock", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return; 
+        }
+
+        if (!inventario.getProductos().isEmpty())
+        {
+            if (!LectorConsola.confirmar("El inventario actual tiene " + inventario.getProductos().size() + " productos. ¿Sustituirlo por los " + recuperados.size() + " del fichero?"))
+            {
+                System.out.println(ColoresConsola.pintar("Recuperación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+        }
+
+        inventario.sustituir(recuperados);
+        System.out.println(ColoresConsola.pintar("[OK] " + recuperados.size() + " productos recuperados desde " + origen.toAbsolutePath(), ColoresConsola.VERDE));
         LectorConsola.pausar();
     }
 }

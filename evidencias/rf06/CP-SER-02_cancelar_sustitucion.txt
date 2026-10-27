@@ -1,0 +1,5 @@
+---------- RECUPERAR INVENTARIO ----------
+Ruta del fichero .dat: datos/salidas/inventario.dat
+El inventario actual tiene 3 productos. ¿Sustituirlo por los 5 del fichero? (S/N): N
+Recuperación cancelada.
+Pulsa Intro para continuar...

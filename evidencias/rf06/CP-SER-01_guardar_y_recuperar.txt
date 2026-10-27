@@ -1,0 +1,46 @@
+================================================
+         DATASTOCK - GESTIÓN DE INVENTARIO
+                 FASE 1 - UT1
+================================================
+Productos en memoria: 5
+1. Explorar ficheros y directorios
+2. Importar productos desde JSON
+3. Importar productos desde XML
+4. Consultar productos
+5. Exportar productos
+6. Guardar y recuperar inventario
+0. Salir
+Selecciona una opción: 6
+
+---------- GUARDAR Y RECUPERAR INVENTARIO ----------
+1. Guardar inventario en fichero .dat
+2. Recuperar inventario desde fichero .dat
+0. Volver al menú principal
+Selecciona una opción: 1
+
+---------- GUARDAR INVENTARIO ----------
+Ruta del fichero de destino: datos/salidas/inventario.dat
+[OK] 5 productos guardados en C:\Users\User\Documents\wsfp_egld\2\acceso_datos\DataStock_UT1_Proyecto_Inicial\datos\salidas\inventario.dat
+Pulsa Intro para continuar...
+
+... (corte de sesión) ...
+
+================================================
+         DATASTOCK - GESTIÓN DE INVENTARIO
+                 FASE 1 - UT1
+================================================
+Productos en memoria: 3
+1. Explorar ficheros y directorios
+2. Importar productos desde JSON
+3. Importar productos desde XML
+4. Consultar productos
+5. Exportar productos
+6. Guardar y recuperar inventario
+0. Salir
+Selecciona una opción: 2
+
+---------- RECUPERAR INVENTARIO ----------
+Ruta del fichero .dat: datos/salidas/inventario.dat
+El inventario actual tiene 3 productos. ¿Sustituirlo por los 5 del fichero? (S/N): S
+[OK] 5 productos recuperados desde C:\Users\User\Documents\wsfp_egld\2\acceso_datos\DataStock_UT1_Proyecto_Inicial\datos\salidas\inventario.dat
+Pulsa Intro para continuar...

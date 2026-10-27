@@ -1,0 +1,4 @@
+---------- RECUPERAR INVENTARIO ----------
+Ruta del fichero .dat: datos/pruebas/rf06/danado.dat
+[ERROR] no se pudo recuperar el inventario: el fichero está dañado o no es un inventario de DataStock
+Pulsa Intro para continuar...

@@ -14,7 +14,7 @@
 | RF-FIC-03 | Importar catálogo XML (DOM) | ✅ Completado |
 | RF-FIC-04 | Consultar y buscar productos | ✅ Completado |
 | RF-FIC-05 | Exportar a JSON y XML | ✅ Completado |
-| RF-FIC-06 | Serialización del inventario | ⏳ Pendiente |
+| RF-FIC-06 | Serialización del inventario | ✅ Completado |
 | RF-FIC-07 | Consultas XPath (independiente) | ⏳ Pendiente |
 | RF-FIC-08 | Acceso aleatorio (independiente) | ⏳ Pendiente |
 
@@ -24,15 +24,16 @@ y sus salidas se guardan en `evidencias/`.
 ## Decisiones de diseño
 
 - **Separación menú / lógica:** `MenuPrincipal` solo pide datos, delega y muestra
-  resultados. Las operaciones con ficheros están en el paquete `ficheros`.
+  resultados. Las operaciones con ficheros están en el paquete `ficheros`, cuyas
+  clases no dependen de la consola.
 - **RF-FIC-01:** `ExploradorRutas` usa la API NIO (`Path`, `Files`).
   `Files.list` se abre con try-with-resources. Se controlan por separado
   las rutas vacías, inexistentes, con caracteres no válidos y sin permisos.
-- **Validación común (RF-FIC-02 y RF-FIC-03):** `ValidadorProducto` recibe los
-  seis campos como texto y aplica las reglas de la sección 6 del enunciado.
-  Los dos importadores usan la misma clase, por lo que JSON y XML validan
-  exactamente igual. `validar()` acumula todos los errores de un producto;
-  `crear()` solo se llama cuando no hay errores.
+- **Validación común:** `ValidadorProducto` recibe los seis campos como texto y
+  aplica las reglas de la sección 6 del enunciado. La usan los importadores JSON
+  y XML y la recuperación del `.dat`, por lo que todos los caminos de entrada
+  validan exactamente igual. `validar()` acumula todos los errores de un
+  producto; `crear()` solo se llama cuando no hay errores.
 - **Normalización de códigos:** se eliminan los espacios extremos y se pasan
   a mayúsculas antes de validar y de comparar duplicados. Así `tec-001` se
   acepta como `TEC-001`, coherente con que la unicidad no distinga mayúsculas.
@@ -66,10 +67,21 @@ y sus salidas se guardan en `evidencias/`.
   los muestre. El XML convierte las excepciones propias de DOM y del
   `Transformer` en `IOException`, de modo que el menú trata igual ambos
   formatos. Las preguntas al usuario (ruta, carpeta existente, confirmación
-  de sobrescritura) están en un único método del menú, `pedirRutaDestino()`.
-  No hay conversor directo JSON↔XML: el modelo intermedio es la colección Java.
-  Los métodos de exportación del menú son casi iguales; unificarlos mediante
-  una interfaz común queda previsto para UT3.
+  de sobrescritura) están en un único método del menú, `pedirRutaDestino()`,
+  que también usa el guardado del `.dat`. No hay conversor directo JSON↔XML:
+  el modelo intermedio es la colección Java. Los métodos de exportación del
+  menú son casi iguales; unificarlos mediante una interfaz común queda previsto
+  para UT3.
+- **RF-FIC-06:** `SerializadorInventario` guarda una copia de la lista con
+  `ObjectOutputStream` y la recupera con `ObjectInputStream`. Al recuperar se
+  comprueba que el objeto leído es una lista, que cada elemento es un `Producto`
+  y que cumple las reglas de `ValidadorProducto`. El menú lee y valida primero,
+  después pide confirmación si hay productos en memoria, y solo entonces llama a
+  `Inventario.sustituir()`: si el fichero está dañado o el usuario cancela, el
+  inventario no cambia. Importar JSON/XML **añade** productos; recuperar un
+  `.dat` **sustituye** el inventario. La serialización Java es un formato binario
+  propio de Java, no un formato de intercambio: solo deben abrirse ficheros
+  generados por DataStock.
 - **Consola de Windows:** para ver correctamente el símbolo € hay que ejecutar
   `chcp 65001` y después `mvn exec:java` en la misma terminal. El botón Run
   del IDE abre una terminal nueva que no conserva ese ajuste.
@@ -119,31 +131,32 @@ DataStock_UT1_Proyecto_Inicial/
 ├── .gitignore
 ├── datos/
 │   ├── ejemplos/              # JSON/XML para comenzar las pruebas
-│   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, rf03, ...)
+│   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, rf03, rf06, ...)
 │   └── salidas/               # Exportaciones y binarios generados (no se suben)
 ├── docs/                      # Registro de pruebas
-├── evidencias/                # Salidas de cada prueba ejecutada y ficheros exportados
+├── evidencias/                # Salidas de cada prueba y ficheros generados
 ├── material_referencia/       # Modelo relacional y script SQL para UT2
 └── src/main/java/es/iesisidra/datastock/
-    ├── App.java                       # Punto de entrada
+    ├── App.java                         # Punto de entrada
     ├── modelo/
     │   ├── Producto.java
     │   ├── Categoria.java
     │   ├── Proveedor.java
     │   └── MovimientoStock.java
     ├── servicio/
-    │   ├── Inventario.java            # Colección compartida; altas sin duplicados y consultas
-    │   └── ResultadoImportacion.java  # Resumen de cada importación
+    │   ├── Inventario.java              # Colección compartida; altas, consultas y sustitución
+    │   └── ResultadoImportacion.java    # Resumen de cada importación
     ├── validacion/
-    │   └── ValidadorProducto.java     # Reglas comunes JSON/XML
+    │   └── ValidadorProducto.java       # Reglas comunes JSON, XML y .dat
     ├── ficheros/
-    │   ├── ExploradorRutas.java       # RF-FIC-01
-    │   ├── ImportadorJson.java        # RF-FIC-02
-    │   ├── ImportadorXml.java         # RF-FIC-03
-    │   ├── ExportadorJson.java        # RF-FIC-05
-    │   └── ExportadorXml.java         # RF-FIC-05
+    │   ├── ExploradorRutas.java         # RF-FIC-01
+    │   ├── ImportadorJson.java          # RF-FIC-02
+    │   ├── ImportadorXml.java           # RF-FIC-03
+    │   ├── ExportadorJson.java          # RF-FIC-05
+    │   ├── ExportadorXml.java           # RF-FIC-05
+    │   └── SerializadorInventario.java  # RF-FIC-06
     ├── ui/
-    │   └── MenuPrincipal.java         # Menú principal y submenús
+    │   └── MenuPrincipal.java           # Menú principal y submenús
     ├── util/
     │   ├── LectorConsola.java
     │   └── ColoresConsola.java
@@ -168,7 +181,7 @@ DataStock_UT1_Proyecto_Inicial/
 
 **4. Consultar productos:** listar (ordenado por código), buscar por código, buscar por nombre, volver.  
 **5. Exportar productos:** exportar JSON, exportar XML, volver.  
-**6. Guardar y recuperar inventario:** guardar `.dat`, recuperar `.dat`, volver.
+**6. Guardar y recuperar inventario:** guardar `.dat`, recuperar `.dat` (sustituye el inventario tras confirmar), volver.
 
 `RF-FIC-07` (XPath) y `RF-FIC-08` (`RandomAccessFile`) se ejecutan en clases independientes.
 
