@@ -1,0 +1,91 @@
+================================================
+         DATASTOCK - GESTIÓN DE INVENTARIO
+                 FASE 1 - UT1
+================================================
+Productos en memoria: 3
+1. Explorar ficheros y directorios
+2. Importar productos desde JSON
+3. Importar productos desde XML
+4. Consultar productos
+5. Exportar productos
+6. Guardar y recuperar inventario
+0. Salir
+Selecciona una opción: 3
+
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/salidas/tres.xml
+Encontrados: 3
+Importados: 0
+Rechazados: 3
+Detalle de incidencias:
+  - ALT-011: ya existe en el inventario
+  - MON-010: ya existe en el inventario
+  - WEB-012: ya existe en el inventario
+[OK] Importación finalizada.
+Pulsa Intro para continuar...
+
+================================================
+         DATASTOCK - GESTIÓN DE INVENTARIO
+                 FASE 1 - UT1
+================================================
+Productos en memoria: 3
+1. Explorar ficheros y directorios
+2. Importar productos desde JSON
+3. Importar productos desde XML
+4. Consultar productos
+5. Exportar productos
+6. Guardar y recuperar inventario
+0. Salir
+Selecciona una opción: 2
+
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/salidas/tres.json
+Encontrados: 3
+Importados: 0
+Rechazados: 3
+Detalle de incidencias:
+  - ALT-011: ya existe en el inventario
+  - MON-010: ya existe en el inventario
+  - WEB-012: ya existe en el inventario
+[OK] Importación finalizada.
+Pulsa Intro para continuar...
+
+================================================
+         DATASTOCK - GESTIÓN DE INVENTARIO
+                 FASE 1 - UT1
+================================================
+Productos en memoria: 3
+1. Explorar ficheros y directorios
+2. Importar productos desde JSON
+3. Importar productos desde XML
+4. Consultar productos
+5. Exportar productos
+6. Guardar y recuperar inventario
+0. Salir
+Selecciona una opción: 4
+
+---------- CONSULTA DE PRODUCTOS ----------
+1. Listar todos los productos
+2. Buscar producto por código
+3. Buscar productos por nombre
+0. Volver al menú principal
+Selecciona una opción: 1
+
+---------- LISTAR PRODUCTOS ----------
+Código: ALT-011
+Nombre: Altavoces estéreo
+Precio: 34.50 € | Stock: 14
+Categoría: 3 | Proveedor: 1
+----------------------------------------
+Código: MON-010
+Nombre: Monitor 27 pulgadas
+Precio: 219.90 € | Stock: 5
+Categoría: 2 | Proveedor: 2
+----------------------------------------
+Código: WEB-012
+Nombre: Webcam HD
+Precio: 29.99 € | Stock: 9
+Categoría: 1 | Proveedor: 3
+
+Total: 3 productos
+Pulsa Intro para continuar...

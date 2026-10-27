@@ -1,0 +1,17 @@
+---------- LISTAR PRODUCTOS ----------
+Código: ALT-011
+Nombre: Altavoces estéreo
+Precio: 34.50 € | Stock: 14
+Categoría: 3 | Proveedor: 1
+----------------------------------------
+Código: MON-010
+Nombre: Monitor 27 pulgadas
+Precio: 219.90 € | Stock: 5
+Categoría: 2 | Proveedor: 2
+----------------------------------------
+Código: WEB-012
+Nombre: Webcam HD
+Precio: 29.99 € | Stock: 9
+Categoría: 1 | Proveedor: 3
+
+Total: 3 productos

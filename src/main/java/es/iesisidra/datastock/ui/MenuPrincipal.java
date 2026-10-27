@@ -4,7 +4,6 @@ import es.iesisidra.datastock.servicio.Inventario;
 import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.LectorConsola;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -14,6 +13,7 @@ import java.util.List;
 
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
 import es.iesisidra.datastock.ficheros.ExportadorJson;
+import es.iesisidra.datastock.ficheros.ExportadorXml;
 import es.iesisidra.datastock.ficheros.ImportadorJson;
 import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.modelo.Producto;
@@ -31,6 +31,7 @@ public class MenuPrincipal {
     private final ImportadorJson importadorJson = new ImportadorJson();
     private final ImportadorXml importadorXml = new ImportadorXml();
     private final ExportadorJson exportadorJson = new ExportadorJson();
+    private final ExportadorXml exportadorXml = new ExportadorXml();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -98,7 +99,7 @@ public class MenuPrincipal {
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 2);
             switch (opcion) {
                 case 1 -> exportarJson();
-                case 2 -> pendiente("RF-FIC-05 · Exportar XML");
+                case 2 -> exportarXml();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -272,7 +273,7 @@ public class MenuPrincipal {
         String texto = LectorConsola.leerTexto("Ruta del fichero de destino: ");
         if (texto == null || texto.trim().isEmpty()) 
         {
-            System.out.println(ColoresConsola.pintar("[ERROR] la ruta está vacia",ColoresConsola.ROJO));    
+            System.out.println(ColoresConsola.pintar("[ERROR] la ruta está vacía",ColoresConsola.ROJO));    
             return null;
         }
         Path destino;
@@ -329,6 +330,37 @@ public class MenuPrincipal {
         {
             int total = exportadorJson.exportar(inventario.listarOrdenado(), destino);
             System.out.println(ColoresConsola.pintar("[OK] " + total + " productos exportados a JSON en " + destino.toAbsolutePath(),
+                ColoresConsola.VERDE));
+        }
+        catch (IOException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + e.getMessage(), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void exportarXml()
+    {
+        System.out.println("\n---------- EXPORTAR XML ----------");
+
+        if (inventario.getProductos().isEmpty())
+        {
+            System.out.println("No hay productos para exportar.");
+            LectorConsola.pausar();
+            return;
+        }
+
+        Path destino = pedirRutaDestino();
+        if (destino == null)
+        {
+            LectorConsola.pausar();
+            return;
+        }
+
+        try
+        {
+            int total = exportadorXml.exportar(inventario.listarOrdenado(), destino);
+            System.out.println(ColoresConsola.pintar("[OK] " + total + " productos exportados a XML en " + destino.toAbsolutePath(),
                 ColoresConsola.VERDE));
         }
         catch (IOException e)

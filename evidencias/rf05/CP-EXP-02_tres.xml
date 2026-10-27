@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalogo>
+  <producto>
+    <codigo>ALT-011</codigo>
+    <nombre>Altavoces estéreo</nombre>
+    <precio>34.50</precio>
+    <stock>14</stock>
+    <categoriaId>3</categoriaId>
+    <proveedorId>1</proveedorId>
+  </producto>
+  <producto>
+    <codigo>MON-010</codigo>
+    <nombre>Monitor 27 pulgadas</nombre>
+    <precio>219.90</precio>
+    <stock>5</stock>
+    <categoriaId>2</categoriaId>
+    <proveedorId>2</proveedorId>
+  </producto>
+  <producto>
+    <codigo>WEB-012</codigo>
+    <nombre>Webcam HD</nombre>
+    <precio>29.99</precio>
+    <stock>9</stock>
+    <categoriaId>1</categoriaId>
+    <proveedorId>3</proveedorId>
+  </producto>
+</catalogo>

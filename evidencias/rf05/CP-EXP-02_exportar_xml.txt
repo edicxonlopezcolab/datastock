@@ -1,0 +1,3 @@
+---------- EXPORTAR XML ----------
+Ruta del fichero de destino: datos/salidas/tres.xml
+[OK] 3 productos exportados a XML en C:\Users\User\Documents\wsfp_egld\2\acceso_datos\DataStock_UT1_Proyecto_Inicial\datos\salidas\tres.xml

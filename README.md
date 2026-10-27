@@ -13,7 +13,7 @@
 | RF-FIC-02 | Importar catálogo JSON | ✅ Completado |
 | RF-FIC-03 | Importar catálogo XML (DOM) | ✅ Completado |
 | RF-FIC-04 | Consultar y buscar productos | ✅ Completado |
-| RF-FIC-05 | Exportar a JSON y XML | ⏳ Pendiente |
+| RF-FIC-05 | Exportar a JSON y XML | ✅ Completado |
 | RF-FIC-06 | Serialización del inventario | ⏳ Pendiente |
 | RF-FIC-07 | Consultas XPath (independiente) | ⏳ Pendiente |
 | RF-FIC-08 | Acceso aleatorio (independiente) | ⏳ Pendiente |
@@ -60,6 +60,16 @@ y sus salidas se guardan en `evidencias/`.
   resultados sin imprimir. `listarOrdenado()` ordena una **copia** con
   `Comparator.comparing(Producto::getCodigo)`, de modo que consultar no altera
   la colección. El menú muestra los resultados con un único método auxiliar.
+- **RF-FIC-05:** `ExportadorJson` (Gson) y `ExportadorXml` (DOM + `Transformer`)
+  reciben la lista ordenada y el destino, escriben en UTF-8 con indentación y
+  no imprimen nada; los errores se lanzan como `IOException` para que el menú
+  los muestre. El XML convierte las excepciones propias de DOM y del
+  `Transformer` en `IOException`, de modo que el menú trata igual ambos
+  formatos. Las preguntas al usuario (ruta, carpeta existente, confirmación
+  de sobrescritura) están en un único método del menú, `pedirRutaDestino()`.
+  No hay conversor directo JSON↔XML: el modelo intermedio es la colección Java.
+  Los métodos de exportación del menú son casi iguales; unificarlos mediante
+  una interfaz común queda previsto para UT3.
 - **Consola de Windows:** para ver correctamente el símbolo € hay que ejecutar
   `chcp 65001` y después `mvn exec:java` en la misma terminal. El botón Run
   del IDE abre una terminal nueva que no conserva ese ajuste.
@@ -110,9 +120,9 @@ DataStock_UT1_Proyecto_Inicial/
 ├── datos/
 │   ├── ejemplos/              # JSON/XML para comenzar las pruebas
 │   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, rf03, ...)
-│   └── salidas/               # Exportaciones y binarios generados
+│   └── salidas/               # Exportaciones y binarios generados (no se suben)
 ├── docs/                      # Registro de pruebas
-├── evidencias/                # Salidas de cada prueba ejecutada
+├── evidencias/                # Salidas de cada prueba ejecutada y ficheros exportados
 ├── material_referencia/       # Modelo relacional y script SQL para UT2
 └── src/main/java/es/iesisidra/datastock/
     ├── App.java                       # Punto de entrada
@@ -129,7 +139,9 @@ DataStock_UT1_Proyecto_Inicial/
     ├── ficheros/
     │   ├── ExploradorRutas.java       # RF-FIC-01
     │   ├── ImportadorJson.java        # RF-FIC-02
-    │   └── ImportadorXml.java         # RF-FIC-03
+    │   ├── ImportadorXml.java         # RF-FIC-03
+    │   ├── ExportadorJson.java        # RF-FIC-05
+    │   └── ExportadorXml.java         # RF-FIC-05
     ├── ui/
     │   └── MenuPrincipal.java         # Menú principal y submenús
     ├── util/
