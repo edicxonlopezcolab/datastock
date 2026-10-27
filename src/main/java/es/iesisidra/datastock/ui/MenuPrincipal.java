@@ -4,9 +4,16 @@ import es.iesisidra.datastock.servicio.Inventario;
 import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.LectorConsola;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
+import es.iesisidra.datastock.ficheros.ExportadorJson;
 import es.iesisidra.datastock.ficheros.ImportadorJson;
 import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.modelo.Producto;
@@ -23,6 +30,7 @@ public class MenuPrincipal {
     private final ExploradorRutas explorador = new ExploradorRutas();
     private final ImportadorJson importadorJson = new ImportadorJson();
     private final ImportadorXml importadorXml = new ImportadorXml();
+    private final ExportadorJson exportadorJson = new ExportadorJson();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -89,7 +97,7 @@ public class MenuPrincipal {
             System.out.println("0. Volver al menú principal");
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 2);
             switch (opcion) {
-                case 1 -> pendiente("RF-FIC-05 · Exportar JSON");
+                case 1 -> exportarJson();
                 case 2 -> pendiente("RF-FIC-05 · Exportar XML");
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
@@ -129,67 +137,21 @@ public class MenuPrincipal {
         LectorConsola.pausar();
     }
 
-    private void importarJson() 
+    private void importarJson()
     {
         System.out.println("\n---------- IMPORTAR JSON ----------");
         String texto = LectorConsola.leerTexto("Digite la Ruta: ");
         ResultadoImportacion resultado = importadorJson.importar(texto, inventario);
-        
-
-        if (resultado.hayErrorGeneral()) 
-        {
-            System.out.println(ColoresConsola.pintar("[ERROR] " + resultado.getErrorGeneral(), ColoresConsola.ROJO));
-        } 
-        else 
-        {
-
-            System.out.println("Encontrados: " + resultado.getEncontrados());
-            System.out.println("Importados: " + resultado.getImportados());
-            System.out.println("Rechazados: " + resultado.getRechazados());
-            
-
-            if (!resultado.getIncidencias().isEmpty()) 
-            {
-                System.out.println("Detalle de incidencias:");
-                for (String incidencia : resultado.getIncidencias()) 
-                {
-                    System.out.println("  - " + incidencia);
-                }
-            }
-            System.out.println(ColoresConsola.pintar("[OK] Importación finalizada.", ColoresConsola.VERDE)); 
-        }
+        mostrarResultado(resultado);
         LectorConsola.pausar();
     }
 
-    private void importarXml() 
+    private void importarXml()
     {
         System.out.println("\n---------- IMPORTAR XML ----------");
         String texto = LectorConsola.leerTexto("Digite la Ruta: ");
         ResultadoImportacion resultado = importadorXml.importar(texto, inventario);
-        
-
-        if (resultado.hayErrorGeneral()) 
-        {
-            System.out.println(ColoresConsola.pintar("[ERROR] " + resultado.getErrorGeneral(), ColoresConsola.ROJO));
-        } 
-        else 
-        {
-
-            System.out.println("Encontrados: " + resultado.getEncontrados());
-            System.out.println("Importados: " + resultado.getImportados());
-            System.out.println("Rechazados: " + resultado.getRechazados());
-            
-
-            if (!resultado.getIncidencias().isEmpty()) 
-            {
-                System.out.println("Detalle de incidencias:");
-                for (String incidencia : resultado.getIncidencias()) 
-                {
-                    System.out.println("  - " + incidencia);
-                }
-            }
-            System.out.println(ColoresConsola.pintar("[OK] Importación finalizada.", ColoresConsola.VERDE)); 
-        }
+        mostrarResultado(resultado);
         LectorConsola.pausar();
     }
 
@@ -279,6 +241,101 @@ public class MenuPrincipal {
             primero = false;
         }
         System.out.println("\nTotal: " + lista.size() + " productos");
+    }
+
+    private void mostrarResultado(ResultadoImportacion resultado)
+    {
+        if (resultado.hayErrorGeneral())
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + resultado.getErrorGeneral(), ColoresConsola.ROJO));
+        }
+        else
+        {
+            System.out.println("Encontrados: " + resultado.getEncontrados());
+            System.out.println("Importados: " + resultado.getImportados());
+            System.out.println("Rechazados: " + resultado.getRechazados());
+
+            if (!resultado.getIncidencias().isEmpty())
+            {
+                System.out.println("Detalle de incidencias:");
+                for (String incidencia : resultado.getIncidencias())
+                {
+                    System.out.println("  - " + incidencia);
+                }
+            }
+            System.out.println(ColoresConsola.pintar("[OK] Importación finalizada.", ColoresConsola.VERDE));
+        }
+    }
+
+    private Path pedirRutaDestino()
+    {
+        String texto = LectorConsola.leerTexto("Ruta del fichero de destino: ");
+        if (texto == null || texto.trim().isEmpty()) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] la ruta está vacia",ColoresConsola.ROJO));    
+            return null;
+        }
+        Path destino;
+        try 
+        {
+            destino = Paths.get(texto.trim());
+        } 
+        catch (InvalidPathException e) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] la ruta no es válida",ColoresConsola.ROJO));    
+            return null;
+        }
+        Path carpeta = destino.toAbsolutePath().getParent();
+        if (carpeta == null || !Files.isDirectory(carpeta)) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] la carpeta de destino no existe",ColoresConsola.ROJO));    
+            return null;
+        }
+        if (Files.exists(destino)) 
+        {
+            if (Files.isDirectory(destino)) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] la ruta apunta a un directorio, no a un fichero", ColoresConsola.ROJO));
+                return null;
+            }
+            if(!LectorConsola.confirmar("El fichero ya existe. ¿Sobrescribirlo?"))
+            {
+                System.out.println(ColoresConsola.pintar("Exportación cancelada.", ColoresConsola.AMARILLO));
+                return null;
+            }    
+        }
+        return destino;
+    }
+
+    private void exportarJson()
+    {
+        System.out.println("\n---------- EXPORTAR JSON ----------");
+
+        if (inventario.getProductos().isEmpty())
+        {
+            System.out.println("No hay productos para exportar.");
+            LectorConsola.pausar();
+            return;
+        }
+
+        Path destino = pedirRutaDestino();
+        if (destino == null)
+        {
+            LectorConsola.pausar();
+            return;
+        }
+
+        try
+        {
+            int total = exportadorJson.exportar(inventario.listarOrdenado(), destino);
+            System.out.println(ColoresConsola.pintar("[OK] " + total + " productos exportados a JSON en " + destino.toAbsolutePath(),
+                ColoresConsola.VERDE));
+        }
+        catch (IOException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + e.getMessage(), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
     }
 }
 

@@ -1,0 +1,4 @@
+---------- EXPORTAR JSON ----------
+Ruta del fichero de destino:datos/salidas/inventario.json
+El fichero ya existe. ¿Sobrescribirlo? (S/N): N
+Exportación cancelada.

@@ -1,0 +1,3 @@
+---------- EXPORTAR JSON ----------
+Ruta del fichero de destino:arpeta_que_no_existe/x.json
+[ERROR] la carpeta de destino no existe
