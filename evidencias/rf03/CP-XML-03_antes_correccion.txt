@@ -1,0 +1,6 @@
+[Fatal Error] con_dtd.xml:2:10: DOCTYPE is not allowed when the feature "http://apache.org/xml/features/disallow-doctype-decl" set to true.
+
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/pruebas/rf03/con_dtd.xml
+[ERROR] el fichero contiene un XML mal formado o con DTD no permitida
+Pulsa Intro para continuar...

@@ -1,0 +1,42 @@
+---------- LISTAR PRODUCTOS ----------
+Código: ESC-031
+Nombre: Escáner plano
+Precio: 89.90 € | Stock: 3
+Categoría: 5 | Proveedor: 2
+----------------------------------------
+Código: IMP-030
+Nombre: Impresora láser
+Precio: 129.00 € | Stock: 4
+Categoría: 5 | Proveedor: 2
+----------------------------------------
+Código: LAM-042
+Nombre: Lámpara LED
+Precio: 22.50 € | Stock: 12
+Categoría: 6 | Proveedor: 2
+----------------------------------------
+Código: MIC-040
+Nombre: Micrófono USB
+Precio: 45.00 € | Stock: 8
+Categoría: 1 | Proveedor: 1
+----------------------------------------
+Código: PAD-050
+Nombre: Alfombrilla
+Precio: 6.50 € | Stock: 30
+Categoría: 1 | Proveedor: 1
+----------------------------------------
+Código: RAT-002
+Nombre: Ratón inalámbrico
+Precio: 14.50 € | Stock: 25
+Categoría: 1 | Proveedor: 1
+----------------------------------------
+Código: TAB-032
+Nombre: Tableta gráfica
+Precio: 59.95 € | Stock: 6
+Categoría: 1 | Proveedor: 3
+----------------------------------------
+Código: TEC-001
+Nombre: Teclado USB
+Precio: 19.95 € | Stock: 12
+Categoría: 1 | Proveedor: 1
+
+Total: 8 productos

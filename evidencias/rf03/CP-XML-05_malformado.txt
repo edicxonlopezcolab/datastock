@@ -1,0 +1,4 @@
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/pruebas/rf03/malformado.xml
+[ERROR] el fichero contiene un XML mal formado o con DTD no permitida
+Pulsa Intro para continuar...

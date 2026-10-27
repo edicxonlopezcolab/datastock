@@ -1,0 +1,4 @@
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/pruebas/rf03/raiz_incorrecta.xml
+[ERROR] la raíz debe ser catalogo
+Pulsa Intro para continuar...

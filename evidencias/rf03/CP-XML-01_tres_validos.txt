@@ -1,0 +1,6 @@
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/pruebas/rf03/tres_validos.xml
+Encontrados: 3
+Importados: 3
+Rechazados: 0
+[OK] Importación finalizada.

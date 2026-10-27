@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogo>
+    <producto>
+        <codigo>IMP-030</codigo>
+        <nombre>Impresora láser</nombre>
+        <precio>129.00</precio>
+        <stock>4</stock>
+        <categoriaId>5</categoriaId>
+        <proveedorId>2</proveedorId>
+    </producto>
+    <producto>
+        <codigo>ESC-031</codigo>
+        <nombre>Escáner plano</nombre>
+        <precio>89.90</precio>
+        <stock>3</stock>
+        <categoriaId>5</categoriaId>
+        <proveedorId>2</proveedorId>
+    </producto>
+    <producto>
+        <codigo>tab-032</codigo>
+        <nombre>Tableta gráfica</nombre>
+        <precio>59.95</precio>
+        <stock>6</stock>
+        <categoriaId>1</categoriaId>
+        <proveedorId>3</proveedorId>
+    </producto>
+</catalogo>

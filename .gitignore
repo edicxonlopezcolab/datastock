@@ -8,3 +8,4 @@ target/
 datos/salidas/*
 !datos/salidas/.gitkeep
 ~$*
+*.tmp

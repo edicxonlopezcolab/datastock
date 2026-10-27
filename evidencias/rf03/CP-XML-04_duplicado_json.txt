@@ -1,0 +1,8 @@
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/pruebas/rf03/duplicado_json.xml
+Encontrados: 2
+Importados: 1
+Rechazados: 1
+Detalle de incidencias:
+  - TEC-001: ya existe en el inventario
+[OK] Importación finalizada.

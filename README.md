@@ -11,7 +11,7 @@
 |---|---|---|
 | RF-FIC-01 | Explorar rutas, ficheros y directorios | ✅ Completado |
 | RF-FIC-02 | Importar catálogo JSON | ✅ Completado |
-| RF-FIC-03 | Importar catálogo XML (DOM) | ⏳ Pendiente |
+| RF-FIC-03 | Importar catálogo XML (DOM) | ✅ Completado |
 | RF-FIC-04 | Consultar y buscar productos | ✅ Completado |
 | RF-FIC-05 | Exportar a JSON y XML | ⏳ Pendiente |
 | RF-FIC-06 | Serialización del inventario | ⏳ Pendiente |
@@ -41,13 +41,21 @@ y sus salidas se guardan en `evidencias/`.
 - **Resultado de importación:** los importadores no imprimen nada; devuelven un
   `ResultadoImportacion` con encontrados, importados, rechazados e incidencias,
   o un error general si el documento no puede procesarse. El menú se encarga
-  de mostrarlo, con `[OK]` en verde y `[ERROR]` en rojo.
+  de mostrarlo, con `[OK]` en verde y `[ERROR]` en rojo, mediante un único
+  método común para JSON y XML.
 - **RF-FIC-02:** `ImportadorJson` lee el documento completo con Gson antes de
   tocar el inventario. Si el JSON está mal formado o no tiene el array
   `productos`, se rechaza entero. Los productos válidos se guardan primero en
   una lista temporal y solo al final se añaden al inventario. Los códigos
   repetidos dentro del mismo fichero se detectan con un `Set`; los que ya
   existen en el inventario, con `Inventario.agregar()`.
+- **RF-FIC-03:** `ImportadorXml` analiza el documento con DOM. La fábrica
+  prohíbe el `DOCTYPE` (`disallow-doctype-decl`), lo que impide DTD y entidades
+  externas y protege frente a ataques XXE. El analizador usa un `DefaultHandler`
+  para no escribir errores por consola. La lectura de cada producto, la
+  validación y el alta en el inventario siguen el mismo esquema que en JSON.
+  Las comprobaciones de ruta y el procesamiento de productos están repetidos en
+  los dos importadores; extraerlos a un componente común queda previsto para UT3.
 - **RF-FIC-04:** las búsquedas y el listado están en `Inventario`, que devuelve
   resultados sin imprimir. `listarOrdenado()` ordena una **copia** con
   `Comparator.comparing(Producto::getCodigo)`, de modo que consultar no altera
@@ -101,7 +109,7 @@ DataStock_UT1_Proyecto_Inicial/
 ├── .gitignore
 ├── datos/
 │   ├── ejemplos/              # JSON/XML para comenzar las pruebas
-│   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, ...)
+│   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, rf03, ...)
 │   └── salidas/               # Exportaciones y binarios generados
 ├── docs/                      # Registro de pruebas
 ├── evidencias/                # Salidas de cada prueba ejecutada
@@ -120,7 +128,8 @@ DataStock_UT1_Proyecto_Inicial/
     │   └── ValidadorProducto.java     # Reglas comunes JSON/XML
     ├── ficheros/
     │   ├── ExploradorRutas.java       # RF-FIC-01
-    │   └── ImportadorJson.java        # RF-FIC-02
+    │   ├── ImportadorJson.java        # RF-FIC-02
+    │   └── ImportadorXml.java         # RF-FIC-03
     ├── ui/
     │   └── MenuPrincipal.java         # Menú principal y submenús
     ├── util/

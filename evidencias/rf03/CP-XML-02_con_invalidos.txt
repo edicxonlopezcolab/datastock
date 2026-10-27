@@ -1,0 +1,9 @@
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/pruebas/rf03/con_invalidos.xml
+Encontrados: 4
+Importados: 2
+Rechazados: 2
+Detalle de incidencias:
+  - Producto 2 (AUR-041): el precio debe ser mayor que 0
+  - Producto 4 (REG-043): stock no es un número entero válido: abc
+[OK] Importación finalizada.

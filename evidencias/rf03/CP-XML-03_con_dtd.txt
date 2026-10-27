@@ -1,0 +1,16 @@
+Productos en memoria: 7
+1. Explorar ficheros y directorios
+2. Importar productos desde JSON
+3. Importar productos desde XML
+4. Consultar productos
+5. Exportar productos
+6. Guardar y recuperar inventario
+0. Salir
+Selecciona una opción: 3
+
+---------- IMPORTAR XML ----------
+Digite la Ruta: datos/pruebas/rf03/con_dtd.xml
+[ERROR] el fichero contiene un XML mal formado o con DTD no permitida
+Pulsa Intro para continuar...
+
+Productos en memoria: 7

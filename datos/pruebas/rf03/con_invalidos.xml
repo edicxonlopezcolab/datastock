@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogo>
+    <producto>
+        <codigo>MIC-040</codigo>
+        <nombre>Micrófono USB</nombre>
+        <precio>45.00</precio>
+        <stock>8</stock>
+        <categoriaId>1</categoriaId>
+        <proveedorId>1</proveedorId>
+    </producto>
+    <producto>
+        <codigo>AUR-041</codigo>
+        <nombre>Auriculares</nombre>
+        <precio>0</precio>
+        <stock>5</stock>
+        <categoriaId>1</categoriaId>
+        <proveedorId>1</proveedorId>
+    </producto>
+    <producto>
+        <codigo>LAM-042</codigo>
+        <nombre>Lámpara LED</nombre>
+        <precio>22.50</precio>
+        <stock>12</stock>
+        <categoriaId>6</categoriaId>
+        <proveedorId>2</proveedorId>
+    </producto>
+    <producto>
+        <codigo>REG-043</codigo>
+        <nombre>Regleta</nombre>
+        <precio>9.99</precio>
+        <stock>abc</stock>
+        <categoriaId>6</categoriaId>
+        <proveedorId>2</proveedorId>
+    </producto>
+</catalogo>

@@ -167,7 +167,7 @@ public class ImportadorJson {
         return resultado;
     }
 
-        /**
+    /**
      * Lee un campo de un producto JSON como texto.
      * @return el valor como texto, o null si falta, es null o no es un valor simple
      */
