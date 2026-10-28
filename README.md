@@ -1,4 +1,4 @@
-# DataStock – Proyecto inicial (UT1)
+# DataStock – UT1
 
 **Módulo:** Acceso a Datos · 2.º DAM · IES Isidra de Guzmán · Curso 2026–2027  
 **Lenguaje:** Java 21 · **Construcción:** Maven · **Interfaz:** consola
@@ -16,10 +16,10 @@
 | RF-FIC-05 | Exportar a JSON y XML | ✅ Completado |
 | RF-FIC-06 | Serialización del inventario | ✅ Completado |
 | RF-FIC-07 | Consultas XPath (independiente) | ✅ Completado |
-| RF-FIC-08 | Acceso aleatorio (independiente) | ⏳ Pendiente |
+| RF-FIC-08 | Acceso aleatorio (independiente) | ✅ Completado |
 
-Las pruebas ejecutadas se documentan en `docs/DataStock_UT1_Registro_Pruebas.docx`
-y sus salidas se guardan en `evidencias/`.
+Las pruebas ejecutadas (52, todas superadas) se documentan en
+`docs/DataStock_UT1_Registro_Pruebas.docx` y sus salidas se guardan en `evidencias/`.
 
 ## Decisiones de diseño
 
@@ -91,6 +91,16 @@ y sus salidas se guardan en `evidencias/`.
   contener valores numéricos válidos. El filtro de precio usa `>` estricto.
   El contador incluye todos los elementos `producto`, aunque tengan datos
   incorrectos, porque XPath consulta el fichero tal cual, sin validarlo.
+- **RF-FIC-08:** `AccesoAleatorioActividad` es una clase ejecutable
+  independiente. Como no comparte la memoria del menú, carga los productos desde
+  un inventario `.dat` guardado con RF-FIC-06, que es la copia en disco de los
+  productos que estaban en memoria. Genera `stock.bin` con registros de 36 bytes
+  (código de 12 caracteres = 24 bytes, precio `double` = 8, stock `int` = 4),
+  ordenados por código y truncando el fichero antes de escribir. La consulta
+  usa `seek(posición × 36)` y la modificación `seek(posición × 36 + 32)`,
+  reposicionando tras leer el valor anterior. Se comprueba que el tamaño sea
+  múltiplo de 36. `stock.bin` es una copia independiente: modificarlo no
+  cambia el `.dat` ni el inventario.
 - **Ejecución de las actividades:** el `pom.xml` define la propiedad
   `exec.mainClass` (por defecto `App`), lo que permite lanzar las actividades
   complementarias con `-Dexec.mainClass=...`. En el proyecto base la clase
@@ -107,7 +117,7 @@ DataStock es una práctica **individual e integradora** que evolucionará durant
 - **UT2 – JDBC:** incorporar MySQL, operaciones SQL y transacciones.
 - **UT3 – Componentes:** reorganizar el acceso a datos en componentes reutilizables.
 
-Esta fase corresponde a la UT1. Los requisitos se implementan de forma progresiva; su estado se indica en la tabla **Estado del desarrollo**. Las opciones aún no implementadas muestran `[PENDIENTE]`.
+Esta versión corresponde a la entrega de la UT1 (etiqueta `ut1-entrega`).
 
 ## 2. Requisitos previos
 
@@ -133,6 +143,11 @@ mvn exec:java -Dexec.mainClass=es.iesisidra.datastock.complementarias.XPathActiv
 mvn exec:java -Dexec.mainClass=es.iesisidra.datastock.complementarias.AccesoAleatorioActividad
 ```
 
+> En PowerShell (Windows), el parámetro va entre comillas, porque PowerShell lo parte por el punto:
+> `mvn exec:java "-Dexec.mainClass=es.iesisidra.datastock.complementarias.XPathActividad"`
+
+La actividad de acceso aleatorio pide primero un inventario `.dat` guardado con la opción 6.1 del menú (por ejemplo `datos/pruebas/rf08/cuatro.dat`) y después la ruta del fichero binario de stock.
+
 > Si el IDE muestra caracteres de control ANSI, desactiva el color al ejecutar Java con `-Ddatastock.color=false`, o configura la variable de entorno `NO_COLOR=1`.
 
 ## 4. Organización del proyecto
@@ -144,7 +159,7 @@ DataStock_UT1_Proyecto_Inicial/
 ├── .gitignore
 ├── datos/
 │   ├── ejemplos/              # JSON/XML para comenzar las pruebas
-│   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, rf03, rf06, rf07, ...)
+│   ├── pruebas/               # Ficheros de prueba propios (rf01 a rf08)
 │   └── salidas/               # Exportaciones y binarios generados (no se suben)
 ├── docs/                      # Registro de pruebas
 ├── evidencias/                # Salidas de cada prueba y ficheros generados
@@ -174,8 +189,8 @@ DataStock_UT1_Proyecto_Inicial/
     │   ├── LectorConsola.java
     │   └── ColoresConsola.java
     └── complementarias/
-        ├── XPathActividad.java          # RF-FIC-07 (ejecutable independiente)
-        └── AccesoAleatorioActividad.java
+        ├── XPathActividad.java            # RF-FIC-07 (ejecutable independiente)
+        └── AccesoAleatorioActividad.java  # RF-FIC-08 (ejecutable independiente)
 ```
 
 ## 5. Menús
@@ -198,7 +213,7 @@ DataStock_UT1_Proyecto_Inicial/
 
 **Actividad XPath (RF-FIC-07):** pide un fichero XML y permite consultarlo por código, por categoría, por precio superior a un valor y contar productos, hasta elegir `0`.
 
-`RF-FIC-08` (`RandomAccessFile`) se ejecuta en una clase independiente.
+**Actividad de acceso aleatorio (RF-FIC-08):** generar `stock.bin`, mostrar todos los registros, consultar una posición y modificar el stock de una posición, hasta elegir `0`.
 
 ## 6. Reglas clave del enunciado
 

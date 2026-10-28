@@ -1,0 +1,3 @@
+1. Generar stock.bin | 2. Mostrar todos | 3. Consultar posición | 4. Modificar stock | 0. Salir
+Opción: 2
+[ERROR] fichero inválido: 26 bytes no es múltiplo de 36

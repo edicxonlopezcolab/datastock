@@ -1,0 +1,5 @@
+1. Generar stock.bin | 2. Mostrar todos | 3. Consultar posición | 4. Modificar stock | 0. Salir
+Opción: 4
+Posición (0-3): 1
+Nuevo stock: -5
+[ERROR] el stock no puede ser negativo

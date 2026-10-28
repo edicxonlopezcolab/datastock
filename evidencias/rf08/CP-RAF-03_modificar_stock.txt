@@ -1,0 +1,13 @@
+1. Generar stock.bin | 2. Mostrar todos | 3. Consultar posición | 4. Modificar stock | 0. Salir
+Opción: 4
+Posición (0-3): 2
+Nuevo stock: 15
+[OK] Actualización correcta: stock 8 → 15
+
+1. Generar stock.bin | 2. Mostrar todos | 3. Consultar posición | 4. Modificar stock | 0. Salir
+Opción: 2
+0 | ALT-011 | 34.50 € | stock 14
+1 | CAB-005 | 8.99 € | stock 40
+2 | MON-003 | 149.99 € | stock 15
+3 | TEC-001 | 19.95 € | stock 12
+Registros: 4 | Tamaño: 144 bytes
