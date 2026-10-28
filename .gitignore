@@ -9,3 +9,4 @@ datos/salidas/*
 !datos/salidas/.gitkeep
 ~$*
 *.tmp
+.~lock.*

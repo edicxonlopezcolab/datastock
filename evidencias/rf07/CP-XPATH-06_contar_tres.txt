@@ -1,0 +1,3 @@
+1. Por código | 2. Por categoría | 3. Precio superior | 4. Contar | 0. Salir
+Opción: 4
+Productos en el documento: 3

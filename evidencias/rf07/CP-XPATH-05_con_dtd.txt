@@ -1,0 +1,2 @@
+Fichero XML: datos/pruebas/rf07/con_dtd.xml
+[ERROR] el XML está mal formado o contiene DOCTYPE (no permitido)

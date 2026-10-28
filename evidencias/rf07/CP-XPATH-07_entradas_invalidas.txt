@@ -1,0 +1,14 @@
+1. Por código | 2. Por categoría | 3. Precio superior | 4. Contar | 0. Salir
+Opción: 1
+Introduce el código a buscar: XXX-999
+No se ha encontrado ningún producto con ese código.
+
+1. Por código | 2. Por categoría | 3. Precio superior | 4. Contar | 0. Salir
+Opción: 2
+Introduce el ID de la categoría: abc
+[ERROR] la categoría debe ser un número entero válido
+
+1. Por código | 2. Por categoría | 3. Precio superior | 4. Contar | 0. Salir
+Opción: 2
+Introduce el ID de la categoría: 0
+[ERROR] la categoría debe ser mayor que 0

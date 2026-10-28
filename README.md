@@ -15,7 +15,7 @@
 | RF-FIC-04 | Consultar y buscar productos | ✅ Completado |
 | RF-FIC-05 | Exportar a JSON y XML | ✅ Completado |
 | RF-FIC-06 | Serialización del inventario | ✅ Completado |
-| RF-FIC-07 | Consultas XPath (independiente) | ⏳ Pendiente |
+| RF-FIC-07 | Consultas XPath (independiente) | ✅ Completado |
 | RF-FIC-08 | Acceso aleatorio (independiente) | ⏳ Pendiente |
 
 Las pruebas ejecutadas se documentan en `docs/DataStock_UT1_Registro_Pruebas.docx`
@@ -82,6 +82,19 @@ y sus salidas se guardan en `evidencias/`.
   `.dat` **sustituye** el inventario. La serialización Java es un formato binario
   propio de Java, no un formato de intercambio: solo deben abrirse ficheros
   generados por DataStock.
+- **RF-FIC-07:** `XPathActividad` es una clase ejecutable independiente que
+  consulta el XML directamente, sin importarlo al inventario. Reutiliza la
+  configuración anti-XXE de RF-FIC-03. Para no inyectar texto del usuario en
+  la expresión, la búsqueda por código obtiene todos los productos con
+  `/catalogo/producto` y compara el código en Java; la categoría y el precio se
+  convierten antes a número (`Integer`, `BigDecimal`), por lo que solo pueden
+  contener valores numéricos válidos. El filtro de precio usa `>` estricto.
+  El contador incluye todos los elementos `producto`, aunque tengan datos
+  incorrectos, porque XPath consulta el fichero tal cual, sin validarlo.
+- **Ejecución de las actividades:** el `pom.xml` define la propiedad
+  `exec.mainClass` (por defecto `App`), lo que permite lanzar las actividades
+  complementarias con `-Dexec.mainClass=...`. En el proyecto base la clase
+  principal estaba fijada en el plugin y ese parámetro se ignoraba.
 - **Consola de Windows:** para ver correctamente el símbolo € hay que ejecutar
   `chcp 65001` y después `mvn exec:java` en la misma terminal. El botón Run
   del IDE abre una terminal nueva que no conserva ese ajuste.
@@ -113,7 +126,7 @@ mvn clean compile
 mvn exec:java
 ```
 
-Para ejecutar las actividades complementarias (todavía pendientes de desarrollar):
+Para ejecutar las actividades complementarias, independientes del menú:
 
 ```bash
 mvn exec:java -Dexec.mainClass=es.iesisidra.datastock.complementarias.XPathActividad
@@ -131,7 +144,7 @@ DataStock_UT1_Proyecto_Inicial/
 ├── .gitignore
 ├── datos/
 │   ├── ejemplos/              # JSON/XML para comenzar las pruebas
-│   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, rf03, rf06, ...)
+│   ├── pruebas/               # Ficheros de prueba propios (rf01, rf02, rf03, rf06, rf07, ...)
 │   └── salidas/               # Exportaciones y binarios generados (no se suben)
 ├── docs/                      # Registro de pruebas
 ├── evidencias/                # Salidas de cada prueba y ficheros generados
@@ -161,7 +174,7 @@ DataStock_UT1_Proyecto_Inicial/
     │   ├── LectorConsola.java
     │   └── ColoresConsola.java
     └── complementarias/
-        ├── XPathActividad.java
+        ├── XPathActividad.java          # RF-FIC-07 (ejecutable independiente)
         └── AccesoAleatorioActividad.java
 ```
 
@@ -183,7 +196,9 @@ DataStock_UT1_Proyecto_Inicial/
 **5. Exportar productos:** exportar JSON, exportar XML, volver.  
 **6. Guardar y recuperar inventario:** guardar `.dat`, recuperar `.dat` (sustituye el inventario tras confirmar), volver.
 
-`RF-FIC-07` (XPath) y `RF-FIC-08` (`RandomAccessFile`) se ejecutan en clases independientes.
+**Actividad XPath (RF-FIC-07):** pide un fichero XML y permite consultarlo por código, por categoría, por precio superior a un valor y contar productos, hasta elegir `0`.
+
+`RF-FIC-08` (`RandomAccessFile`) se ejecuta en una clase independiente.
 
 ## 6. Reglas clave del enunciado
 

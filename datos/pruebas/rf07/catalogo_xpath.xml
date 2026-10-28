@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogo>
+  <producto><codigo>TEC-001</codigo><nombre>Teclado USB</nombre><precio>19.95</precio><stock>12</stock><categoriaId>1</categoriaId><proveedorId>1</proveedorId></producto>
+  <producto><codigo>RAT-002</codigo><nombre>Ratón inalámbrico</nombre><precio>14.50</precio><stock>25</stock><categoriaId>1</categoriaId><proveedorId>1</proveedorId></producto>
+  <producto><codigo>MON-003</codigo><nombre>Monitor 24 pulgadas</nombre><precio>149.99</precio><stock>8</stock><categoriaId>2</categoriaId><proveedorId>2</proveedorId></producto>
+  <producto><codigo>DIS-004</codigo><nombre>Disco externo</nombre><precio>100.00</precio><stock>4</stock><categoriaId>4</categoriaId><proveedorId>2</proveedorId></producto>
+  <producto><codigo>ERR-005</codigo><nombre>Producto con datos erróneos</nombre><precio>abc</precio><stock>-3</stock><categoriaId>3</categoriaId><proveedorId>1</proveedorId></producto>
+</catalogo>

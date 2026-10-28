@@ -1,0 +1,5 @@
+1. Por código | 2. Por categoría | 3. Precio superior | 4. Contar | 0. Salir
+Opción: 3
+Introduce el precio mínimo (ej. 10.50): 100
+MON-003 | Monitor 24 pulgadas | 149.99 €
+Total encontrados: 1
