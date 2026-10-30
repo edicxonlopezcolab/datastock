@@ -4,7 +4,7 @@
   <groupId>es.iesisidra</groupId>
   <artifactId>datastock-ut1</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>DataStock - Proyecto inicial UT1</name>
+  <name>DataStock - Proyecto inicial UT2</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>21</maven.compiler.release>
@@ -15,11 +15,13 @@
   <dependencies>
     <!-- Para RF-FIC-02 y RF-FIC-05. Se facilita la dependencia, NO la solución. -->
     <dependency><groupId>com.google.code.gson</groupId><artifactId>gson</artifactId><version>${gson.version}</version></dependency>
+    <!-- UT2: conector JDBC de MySQL -->
+    <dependency><groupId>com.mysql</groupId><artifactId>mysql-connector-j</artifactId><version>9.3.0</version></dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.13.0</version></plugin>
-      <plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.5.0</version><configuration><mainClass>${exec.mainClass}</mainClass></configuration></plugin>
+      <plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.5.0</version><configuration><mainClass>${exec.mainClass}</mainClass><cleanupDaemonThreads>false</cleanupDaemonThreads></configuration></plugin>
     </plugins>
   </build>
 </project>

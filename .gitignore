@@ -10,3 +10,4 @@ datos/salidas/*
 ~$*
 *.tmp
 .~lock.*
+src/main/resources/db.properties

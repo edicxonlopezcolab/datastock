@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
@@ -17,6 +18,9 @@ import es.iesisidra.datastock.ficheros.ExportadorXml;
 import es.iesisidra.datastock.ficheros.ImportadorJson;
 import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.ficheros.SerializadorInventario;
+import es.iesisidra.datastock.jdbc.ComprobadorConexion;
+import es.iesisidra.datastock.jdbc.ErroresSQL;
+import es.iesisidra.datastock.jdbc.InfoConexion;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 
@@ -34,6 +38,7 @@ public class MenuPrincipal {
     private final ExportadorJson exportadorJson = new ExportadorJson();
     private final ExportadorXml exportadorXml = new ExportadorXml();
     private final SerializadorInventario serializador = new SerializadorInventario();
+    private final ComprobadorConexion comprobador = new ComprobadorConexion();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -49,8 +54,9 @@ public class MenuPrincipal {
             System.out.println("4. Consultar productos");
             System.out.println("5. Exportar productos");
             System.out.println("6. Guardar y recuperar inventario");
+            System.out.println("7. Gestionar base de datos MySQL (UT2)");
             System.out.println("0. Salir");
-            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 6);
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 7);
             switch (opcion) {
                 case 1 -> explorarRuta();
                 case 2 -> importarJson() ;
@@ -58,6 +64,7 @@ public class MenuPrincipal {
                 case 4 -> menuConsultas();
                 case 5 -> menuExportaciones();
                 case 6 -> menuSerializacion();
+                case 7 -> menuMySQL();
                 case 0 -> System.out.println(ColoresConsola.pintar("Hasta pronto.", ColoresConsola.VERDE));
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -67,7 +74,7 @@ public class MenuPrincipal {
     private void mostrarCabecera() {
         System.out.println(ColoresConsola.pintar("\n================================================", ColoresConsola.CIAN));
         System.out.println(ColoresConsola.pintar("         DATASTOCK - GESTIÓN DE INVENTARIO", ColoresConsola.NEGRITA));
-        System.out.println(ColoresConsola.pintar("                 FASE 1 - UT1", ColoresConsola.CIAN));
+        System.out.println(ColoresConsola.pintar("                 FASE 2 - UT2", ColoresConsola.CIAN));
         System.out.println(ColoresConsola.pintar("================================================", ColoresConsola.CIAN));
         System.out.println(ColoresConsola.pintar("Productos en memoria: " + inventario.getProductos().size(), ColoresConsola.GRIS));
     }
@@ -123,6 +130,67 @@ public class MenuPrincipal {
                 default -> throw new IllegalStateException("Opción inesperada");
             }
         } while (opcion != 0);
+    }
+
+    private void menuMySQL()
+    {
+        int opcion;
+        do
+        {
+            System.out.println("\n---------- GESTIÓN MYSQL - UT2 ----------");
+            System.out.println("1. Comprobar conexión y mostrar información de la BD");
+            System.out.println("2. Gestionar categorías");
+            System.out.println("3. Gestionar proveedores");
+            System.out.println("4. Gestionar productos (CRUD)");
+            System.out.println("5. Consultar y buscar productos");
+            System.out.println("6. Registrar entrada o salida de stock");
+            System.out.println("7. Consultar historial de movimientos");
+            System.out.println("8. Importar productos de memoria a MySQL");
+            System.out.println("9. Demostración de transacción con commit/rollback");
+            System.out.println("0. Volver al menú principal");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 9);
+            switch (opcion)
+            {
+                case 1 -> comprobarConexion();
+                case 2 -> pendiente("RF-JDBC-02 · Categorías");
+                case 3 -> pendiente("RF-JDBC-02 · Proveedores");
+                case 4 -> pendiente("RF-JDBC-03 · Productos");
+                case 5 -> pendiente("RF-JDBC-04 · Consultas");
+                case 6 -> pendiente("RF-JDBC-05 · Movimientos");
+                case 7 -> pendiente("RF-JDBC-06 · Historial");
+                case 8 -> pendiente("RF-JDBC-07 · Importar de memoria");
+                case 9 -> pendiente("RF-JDBC-08 · Transacciones");
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        }
+        while (opcion != 0);
+    }
+
+        /**
+     * Opción 7.1: comprueba la conexión con MySQL y muestra los datos
+     * de la base de datos (RF-JDBC-01).
+     */
+    private void comprobarConexion()
+    {
+        System.out.println("\n---------- COMPROBAR CONEXIÓN ----------");
+
+        ComprobadorConexion comprobador = new ComprobadorConexion();
+        try
+        {
+            InfoConexion info = comprobador.comprobar();
+
+            System.out.println(ColoresConsola.pintar("[OK] Conexión establecida correctamente.", ColoresConsola.VERDE));
+            System.out.println("Base de datos: " + info.getBaseDatos());
+            System.out.println("Gestor: " + info.getGestor());
+            System.out.println("Versión: " + info.getVersion());
+            System.out.println("Productos almacenados: " + info.getProductos());
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
     }
 
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */
@@ -461,5 +529,6 @@ public class MenuPrincipal {
         System.out.println(ColoresConsola.pintar("[OK] " + recuperados.size() + " productos recuperados desde " + origen.toAbsolutePath(), ColoresConsola.VERDE));
         LectorConsola.pausar();
     }
+
 }
 
