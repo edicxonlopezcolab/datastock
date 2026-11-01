@@ -213,7 +213,7 @@ public class MenuPrincipal {
             {
                 case 1 -> altaCategoria();
                 case 2 -> listarCategorias();
-                case 3 -> pendiente("Modificar categoría");
+                case 3 -> modificarCategoria();
                 case 4 -> pendiente("Eliminar categoría");
                 case 5 -> consultarCategoria();
                 case 0 -> { }
@@ -318,6 +318,63 @@ public class MenuPrincipal {
             System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
         }
         
+        LectorConsola.pausar();
+    }
+
+    private void modificarCategoria() 
+    {
+        System.out.println("\n---------- MODIFICAR CATEGORÍA ----------");
+        int id = LectorConsola.leerEntero("Id de la categoría: ");
+        if (id <= 0) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el id debe ser un entero positivo", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+        try 
+        {
+            Categoria actual = categoriaDAO.buscarPorId(id);
+            
+            if (actual == null) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] no existe ninguna categoría con id " + id, ColoresConsola.ROJO));
+                LectorConsola.pausar();
+                return;
+            }
+            System.out.println("Nombre actual: " + actual.getNombre());
+            String nuevo = LectorConsola.leerTexto("Nuevo nombre: ").trim();
+            if (nuevo.isEmpty()) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] el nombre no puede estar vacío", ColoresConsola.ROJO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (nuevo.length() > 60) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] el nombre no puede superar los 60 caracteres", ColoresConsola.ROJO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (!LectorConsola.confirmar("¿Cambiar el nombre a \"" + nuevo + "\"?")) 
+            {
+                System.out.println(ColoresConsola.pintar("Modificación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+            boolean actualizado = categoriaDAO.actualizar(new Categoria(id, nuevo));
+            if (actualizado) 
+            {
+                System.out.println(ColoresConsola.pintar("[OK] Categoría actualizada.", ColoresConsola.VERDE));
+            } 
+            else 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] la categoría ya no existe", ColoresConsola.ROJO));
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
         LectorConsola.pausar();
     }
 

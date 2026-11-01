@@ -59,6 +59,11 @@ public class CategoriaDAO
         return null;
     }
 
+    /**
+     * Da de alta una categoría.
+     * @param c categoría con id y nombre
+     * @throws SQLException si el id o el nombre ya existen, o si falla la conexión
+     */
     public void insertar(Categoria c) throws SQLException
     {
         String sql = "INSERT INTO categoria (id, nombre) VALUES(?, ?)";
@@ -67,6 +72,24 @@ public class CategoriaDAO
             ps.setInt(1, c.getId());
             ps.setString(2, c.getNombre());
             ps.executeUpdate();
+        }
+    }
+
+    /**
+     * Cambia el nombre de una categoría. El id no se modifica.
+     * @param c categoría con el id existente y el nombre nuevo
+     * @return true si se actualizó, false si no existe ninguna categoría con ese id
+     * @throws SQLException si el nombre ya existe o falla la conexión
+     */
+    public boolean actualizar(Categoria c) throws SQLException
+    {
+        String sql = "UPDATE categoria SET nombre = ? WHERE id = ?";
+        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql)) 
+        {
+            ps.setString(1, c.getNombre());
+            ps.setInt(2, c.getId());
+            int filas = ps.executeUpdate();
+            return filas == 1;
         }
     }
 }
