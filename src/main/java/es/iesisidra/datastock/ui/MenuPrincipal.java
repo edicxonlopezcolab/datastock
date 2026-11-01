@@ -18,9 +18,11 @@ import es.iesisidra.datastock.ficheros.ExportadorXml;
 import es.iesisidra.datastock.ficheros.ImportadorJson;
 import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.ficheros.SerializadorInventario;
+import es.iesisidra.datastock.jdbc.CategoriaDAO;
 import es.iesisidra.datastock.jdbc.ComprobadorConexion;
 import es.iesisidra.datastock.jdbc.ErroresSQL;
 import es.iesisidra.datastock.jdbc.InfoConexion;
+import es.iesisidra.datastock.modelo.Categoria;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 
@@ -39,6 +41,7 @@ public class MenuPrincipal {
     private final ExportadorXml exportadorXml = new ExportadorXml();
     private final SerializadorInventario serializador = new SerializadorInventario();
     private final ComprobadorConexion comprobador = new ComprobadorConexion();
+    private final CategoriaDAO categoriaDAO = new CategoriaDAO();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -152,7 +155,7 @@ public class MenuPrincipal {
             switch (opcion)
             {
                 case 1 -> comprobarConexion();
-                case 2 -> pendiente("RF-JDBC-02 · Categorías");
+                case 2 -> menuCategorias();
                 case 3 -> pendiente("RF-JDBC-02 · Proveedores");
                 case 4 -> pendiente("RF-JDBC-03 · Productos");
                 case 5 -> pendiente("RF-JDBC-04 · Consultas");
@@ -192,6 +195,61 @@ public class MenuPrincipal {
         }
         LectorConsola.pausar();
     }
+
+    private void menuCategorias()
+    {
+        int opcion;
+        do
+        {
+            System.out.println("\n---------- CATEGORÍAS ----------");
+            System.out.println("1. Listar categorías");
+            System.out.println("2. Consultar categoría por id");
+            System.out.println("3. Alta de categoría");
+            System.out.println("4. Modificar categoría");
+            System.out.println("5. Baja de categoría");
+            System.out.println("0. Volver");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 5);
+            switch (opcion)
+            {
+                case 1 -> listarCategorias();
+                case 2 -> pendiente("Consultar categoría");
+                case 3 -> pendiente("Alta de categoría");
+                case 4 -> pendiente("Modificar categoría");
+                case 5 -> pendiente("Baja de categoría");
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        }
+        while (opcion != 0);
+    }
+
+        private void listarCategorias()
+        {
+            System.out.println("\n---------- LISTADO DE CATEGORÍAS ----------");
+            try
+            {
+                List<Categoria> categorias = categoriaDAO.listar();
+                
+                if (categorias.isEmpty())
+                {
+                    System.out.println("No hay categorías registradas.");
+                }
+                else
+                {
+                    for (Categoria c : categorias)
+                    {
+                        System.out.println(c.getId() + " | " + c.getNombre());
+                    }
+                    System.out.println("Total: " + categorias.size());
+                }
+            }
+            catch (SQLException e)
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+            }
+            
+            LectorConsola.pausar();
+        }
 
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */
     private void pendiente(String requisito) {
