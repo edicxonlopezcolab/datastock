@@ -21,6 +21,9 @@ public final class ErroresSQL
         {
             case 1045 -> "usuario o contraseña incorrectos";
             case 1049 -> "la base de datos datastock no existe; ejecuta el script SQL";
+            case 1062 -> e.getMessage().contains("PRIMARY")
+                        ? "ya existe un registro con ese identificador"
+                        : "ya existe un registro con ese valor en un campo que no admite repetidos (nombre o email)";
             default -> estado.startsWith("08")
                     ? "no se puede conectar con el servidor MySQL; comprueba que está arrancado"
                     : e.getMessage();

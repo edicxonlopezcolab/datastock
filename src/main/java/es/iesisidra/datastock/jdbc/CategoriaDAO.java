@@ -18,19 +18,55 @@ import java.sql.PreparedStatement;
 public class CategoriaDAO
 {
     public List<Categoria> listar() throws SQLException
+{
+    String sql = "SELECT id, nombre FROM categoria ORDER BY id";
+    List<Categoria> lista = new ArrayList<>();
+
+    try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery())
     {
-        List<Categoria> lista = new ArrayList<>();
-        try (Connection con = ConexionBD.abrir())
+        while (rs.next())
         {
-            try (PreparedStatement ps = con.prepareStatement("SELECT id, nombre FROM categoria ORDER BY nombre");
-            ResultSet rs = ps.executeQuery())
+            lista.add(new Categoria(rs.getInt("id"), rs.getString("nombre")));
+        }
+    }
+    return lista;
+}
+    /**
+     * Busca una categoría por su identificador.
+     * @param id identificador de la categoría
+     * @return la categoría, o null si no existe
+     * @throws SQLException si no se puede conectar o consultar
+     */
+    public Categoria buscarPorId(int id) throws SQLException 
+    {
+        String sql = "SELECT id, nombre FROM categoria WHERE id = ?";
+
+        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql)) 
+        {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) 
             {
-                while(rs.next())
+                if (rs.next()) 
                 {
-                    lista.add(new Categoria(rs.getInt(1),rs.getString(2)));
+                    return new Categoria(
+                        rs.getInt("id"),
+                        rs.getString("nombre")
+                    );
                 }
             }
-            return lista;
+        }
+        return null;
+    }
+
+    public void insertar(Categoria c) throws SQLException
+    {
+        String sql = "INSERT INTO categoria (id, nombre) VALUES(?, ?)";
+        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql)) 
+        {
+            ps.setInt(1, c.getId());
+            ps.setString(2, c.getNombre());
+            ps.executeUpdate();
         }
     }
 }

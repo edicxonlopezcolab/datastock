@@ -51,12 +51,12 @@ public class MenuPrincipal {
         int opcion;
         do {
             mostrarCabecera();
-            System.out.println("1. Explorar ficheros y directorios");
-            System.out.println("2. Importar productos desde JSON");
-            System.out.println("3. Importar productos desde XML");
-            System.out.println("4. Consultar productos");
-            System.out.println("5. Exportar productos");
-            System.out.println("6. Guardar y recuperar inventario");
+            System.out.println("1. Explorar ficheros y directorios (UT1)");
+            System.out.println("2. Importar productos desde JSON (UT1)");
+            System.out.println("3. Importar productos desde XML (UT1)");
+            System.out.println("4. Consultar productos en memoria (UT1)");
+            System.out.println("5. Exportar productos (UT1)");
+            System.out.println("6. Guardar y recuperar inventario (UT1)");
             System.out.println("7. Gestionar base de datos MySQL (UT2)");
             System.out.println("0. Salir");
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 7);
@@ -202,20 +202,20 @@ public class MenuPrincipal {
         do
         {
             System.out.println("\n---------- CATEGORÍAS ----------");
-            System.out.println("1. Listar categorías");
-            System.out.println("2. Consultar categoría por id");
-            System.out.println("3. Alta de categoría");
-            System.out.println("4. Modificar categoría");
-            System.out.println("5. Baja de categoría");
-            System.out.println("0. Volver");
+            System.out.println("1. Dar de alta una categoría");
+            System.out.println("2. Listar categorías");
+            System.out.println("3. Modificar el nombre de una categoría");
+            System.out.println("4. Eliminar una categoría");
+            System.out.println("5. Consultar categoría por id");
+            System.out.println("0. Volver al menú MySQL");
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 5);
             switch (opcion)
             {
-                case 1 -> listarCategorias();
-                case 2 -> pendiente("Consultar categoría");
-                case 3 -> pendiente("Alta de categoría");
-                case 4 -> pendiente("Modificar categoría");
-                case 5 -> pendiente("Baja de categoría");
+                case 1 -> altaCategoria();
+                case 2 -> listarCategorias();
+                case 3 -> pendiente("Modificar categoría");
+                case 4 -> pendiente("Eliminar categoría");
+                case 5 -> consultarCategoria();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -223,33 +223,103 @@ public class MenuPrincipal {
         while (opcion != 0);
     }
 
-        private void listarCategorias()
+    private void listarCategorias()
+    {
+        System.out.println("\n---------- LISTADO DE CATEGORÍAS ----------");
+        try
         {
-            System.out.println("\n---------- LISTADO DE CATEGORÍAS ----------");
-            try
-            {
-                List<Categoria> categorias = categoriaDAO.listar();
-                
-                if (categorias.isEmpty())
-                {
-                    System.out.println("No hay categorías registradas.");
-                }
-                else
-                {
-                    for (Categoria c : categorias)
-                    {
-                        System.out.println(c.getId() + " | " + c.getNombre());
-                    }
-                    System.out.println("Total: " + categorias.size());
-                }
-            }
-            catch (SQLException e)
-            {
-                System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
-            }
+            List<Categoria> categorias = categoriaDAO.listar();
             
-            LectorConsola.pausar();
+            if (categorias.isEmpty())
+            {
+                System.out.println("No hay categorías registradas.");
+            }
+            else
+            {
+                for (Categoria c : categorias)
+                {
+                    System.out.println(c.getId() + " | " + c.getNombre());
+                }
+                System.out.println("Total: " + categorias.size());
+            }
         }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        
+        LectorConsola.pausar();
+    }
+
+    private void consultarCategoria() 
+    {
+        System.out.println("\n---------- CONSULTAR CATEGORÍA ----------");   
+        int id = LectorConsola.leerEntero("Id de la categoría: ");
+        if (id <= 0) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el id debe ser un entero positivo", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+        try 
+        {
+            Categoria c = categoriaDAO.buscarPorId(id);
+            
+            if (c == null) 
+            {
+                System.out.println("No existe ninguna categoría con id " + id);
+            } 
+            else 
+            {
+                System.out.println(c.getId() + " | " + c.getNombre());
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        
+        LectorConsola.pausar();
+    }
+
+    private void altaCategoria() 
+    {
+        System.out.println("\n---------- ALTA DE CATEGORÍA ----------");
+        
+        int id = LectorConsola.leerEntero("Id de la categoría: ");
+        if (id <= 0) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el id debe ser un entero positivo", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+        String nombre = LectorConsola.leerTexto("Nombre de la categoría: ").trim();
+        if (nombre.isEmpty()) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el nombre no puede estar vacío", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+        
+        if (nombre.length() > 60) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el nombre no puede superar los 60 caracteres", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+        
+        try 
+        {
+            categoriaDAO.insertar(new Categoria(id, nombre));
+            System.out.println(ColoresConsola.pintar("[OK] Categoría creada.", ColoresConsola.VERDE));
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        
+        LectorConsola.pausar();
+    }
 
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */
     private void pendiente(String requisito) {
