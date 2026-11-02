@@ -24,6 +24,8 @@ public final class ErroresSQL
             case 1062 -> e.getMessage().contains("PRIMARY")
                         ? "ya existe un registro con ese identificador"
                         : "ya existe un registro con ese valor en un campo que no admite repetidos (nombre o email)";
+            case 1451 -> "no se puede eliminar: tiene registros asociados (productos o movimientos) que dependen de él";
+            case 1452 -> "la categoría o el proveedor indicado no existe (integridad referencial)";
             default -> estado.startsWith("08")
                     ? "no se puede conectar con el servidor MySQL; comprueba que está arrancado"
                     : e.getMessage();

@@ -214,7 +214,7 @@ public class MenuPrincipal {
                 case 1 -> altaCategoria();
                 case 2 -> listarCategorias();
                 case 3 -> modificarCategoria();
-                case 4 -> pendiente("Eliminar categoría");
+                case 4 -> eliminarCategoria();
                 case 5 -> consultarCategoria();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
@@ -375,6 +375,50 @@ public class MenuPrincipal {
         {
             System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
         }
+        LectorConsola.pausar();
+    }
+
+    private void eliminarCategoria() 
+    {
+        System.out.println("\n---------- ELIMINAR CATEGORÍA ----------");
+        int id = LectorConsola.leerEntero("Id de la categoría: ");
+        if (id <= 0) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el id debe ser un entero positivo", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+        try 
+        {
+            Categoria actual = categoriaDAO.buscarPorId(id);
+            if (actual == null) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] no existe ninguna categoría con id " + id, ColoresConsola.ROJO));
+                LectorConsola.pausar();
+                return;
+            }
+            System.out.println("Categoría: " + actual.getId() + " | " + actual.getNombre());
+            if (!LectorConsola.confirmar("¿Eliminar esta categoría?")) 
+            {
+                System.out.println(ColoresConsola.pintar("Eliminación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+            boolean eliminado = categoriaDAO.eliminar(id);
+            if (eliminado) 
+            {
+                System.out.println(ColoresConsola.pintar("[OK] Categoría eliminada.", ColoresConsola.VERDE));
+            } 
+            else 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] la categoría ya no existe", ColoresConsola.ROJO));
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        
         LectorConsola.pausar();
     }
 

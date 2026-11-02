@@ -92,4 +92,21 @@ public class CategoriaDAO
             return filas == 1;
         }
     }
+
+    /**
+     * Elimina una categoría por su identificador.
+     * @param id identificador de la categoría
+     * @return true si se eliminó, false si no existía
+     * @throws SQLException si tiene productos asociados (clave foránea) o falla la conexión
+     */
+    public boolean eliminar(int id) throws SQLException
+    {
+        String sql = "DELETE FROM categoria WHERE id = ?";
+        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql)) 
+        {
+            ps.setInt(1, id);
+            int filas = ps.executeUpdate();
+            return filas == 1;
+        }
+    }
 }
