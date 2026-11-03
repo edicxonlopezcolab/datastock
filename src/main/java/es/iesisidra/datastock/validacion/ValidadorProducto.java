@@ -25,8 +25,8 @@ public class ValidadorProducto
         validarNombre(nombre, errores);
         validarPrecio(precio, errores);
         validarEntero(stock, "stock", 0, errores);
-        validarEntero(categoriaId, "categoriaId", 1, errores);
-        validarEntero(proveedorId, "proveedorId", 1, errores);
+        validarEntero(categoriaId, "la categoría", 1, errores);
+        validarEntero(proveedorId, "el proveedor", 1, errores);
         return errores;
     }
 

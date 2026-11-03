@@ -3,6 +3,7 @@ package es.iesisidra.datastock.ui;
 import es.iesisidra.datastock.servicio.Inventario;
 import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.LectorConsola;
+import es.iesisidra.datastock.validacion.ValidadorProducto;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ import es.iesisidra.datastock.jdbc.CategoriaDAO;
 import es.iesisidra.datastock.jdbc.ComprobadorConexion;
 import es.iesisidra.datastock.jdbc.ErroresSQL;
 import es.iesisidra.datastock.jdbc.InfoConexion;
+import es.iesisidra.datastock.jdbc.ProductoDAO;
 import es.iesisidra.datastock.jdbc.ProveedorDAO;
 import es.iesisidra.datastock.modelo.Categoria;
 import es.iesisidra.datastock.modelo.Producto;
@@ -45,6 +47,8 @@ public class MenuPrincipal {
     private final ComprobadorConexion comprobador = new ComprobadorConexion();
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
     private final ProveedorDAO proveedorDAO = new ProveedorDAO();
+    private final ProductoDAO productoDAO = new ProductoDAO();
+    private final ValidadorProducto validador = new ValidadorProducto();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -160,7 +164,7 @@ public class MenuPrincipal {
                 case 1 -> comprobarConexion();
                 case 2 -> menuCategorias();
                 case 3 -> menuProveedores();
-                case 4 -> pendiente("RF-JDBC-03 · Productos");
+                case 4 -> menuProductos();
                 case 5 -> pendiente("RF-JDBC-04 · Consultas");
                 case 6 -> pendiente("RF-JDBC-05 · Movimientos");
                 case 7 -> pendiente("RF-JDBC-06 · Historial");
@@ -425,7 +429,7 @@ public class MenuPrincipal {
         LectorConsola.pausar();
     }
 
-        private void menuProveedores()
+    private void menuProveedores()
     {
         int opcion;
         do
@@ -661,6 +665,138 @@ public class MenuPrincipal {
         LectorConsola.pausar();
     }
 
+    private void menuProductos()
+    {
+        int opcion;
+        do
+        {
+            System.out.println("\n---------- PRODUCTOS ----------");
+            System.out.println("1. Dar de alta un producto");
+            System.out.println("2. Consultar producto por código");
+            System.out.println("3. Modificar un producto");
+            System.out.println("4. Eliminar un producto");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 4);
+            switch (opcion)
+            {
+                case 1 -> altaProducto();
+                case 2 -> consultarProducto();
+                case 3 -> pendiente("Modificar producto");
+                case 4 -> pendiente("Eliminar producto");
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        }
+        while (opcion != 0);
+    }
+
+    private void altaProducto()
+    {
+        System.out.println("\n---------- ALTA DE PRODUCTO ----------");
+        String codigo = LectorConsola.leerTexto("Código (máx. 12: letras, números y guion): ").trim();
+        String nombre = LectorConsola.leerTexto("Nombre (3 a 100 caracteres): ").trim();
+        String precio = LectorConsola.leerTexto("Precio (ej. 19.95): ").trim();
+        String stock = LectorConsola.leerTexto("Stock inicial: ").trim();
+        String categoria = LectorConsola.leerTexto("Id de categoría: ").trim();
+        String proveedor = LectorConsola.leerTexto("Id de proveedor: ").trim();
+        List<String> errores = validador.validar(codigo, nombre, precio, stock, categoria, proveedor);
+        if (!errores.isEmpty()) 
+        {
+            for (String error : errores) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] " + error, ColoresConsola.ROJO));
+            }
+            LectorConsola.pausar();
+            return;
+        }
+        Producto p = validador.crear(codigo, nombre, precio, stock, categoria, proveedor);
+        try 
+        {
+            if (productoDAO.buscarPorCodigo(p.getCodigo()) != null) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] ya existe un producto con el código " + p.getCodigo(), ColoresConsola.ROJO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (categoriaDAO.buscarPorId(p.getCategoriaId()) == null) 
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] no existe la categoría con id " + p.getCategoriaId(), ColoresConsola.ROJO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (proveedorDAO.buscarPorId(p.getProveedorId()) == null) 
+            {
+                error("no existe el proveedor con id " + p.getProveedorId());
+                return;
+            }
+            productoDAO.insertar(p);
+            System.out.println(ColoresConsola.pintar("[OK] Producto creado.", ColoresConsola.VERDE));
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        
+        LectorConsola.pausar();
+    }
+
+    private void consultarProducto() 
+    {
+        System.out.println("\n---------- CONSULTAR PRODUCTO ----------");
+        String texto = LectorConsola.leerTexto("Código del producto: ");
+        String codigo = ValidadorProducto.normalizarCodigo(texto);
+        if (codigo.isEmpty()) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] el código no puede estar vacío", ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        } 
+        try 
+        {
+            Producto p = productoDAO.buscarPorCodigo(codigo);
+            if (p == null) 
+            {
+                System.out.println("No existe ningún producto con el código " + codigo);
+            } 
+            else 
+            {
+                System.out.println("Código: " + p.getCodigo());
+                System.out.println("Nombre: " + p.getNombre());
+                System.out.println("Precio: " + p.getPrecio() + " €");
+                System.out.println("Stock: " + p.getStock());
+                
+                Categoria cat = categoriaDAO.buscarPorId(p.getCategoriaId());
+                String textoCategoria;
+                if (cat != null) 
+                {
+                    textoCategoria = cat.getId() + " - " + cat.getNombre();
+                } 
+                else 
+                {
+                    textoCategoria = String.valueOf(p.getCategoriaId());
+                }
+                System.out.println("Categoría: " + textoCategoria);
+
+                Proveedor prov = proveedorDAO.buscarPorId(p.getProveedorId());
+                String textoProveedor;
+                if (prov != null) 
+                {
+                    textoProveedor = prov.getId() + " - " + prov.getNombre();
+                } 
+                else 
+                {
+                    textoProveedor = String.valueOf(p.getProveedorId());
+                }
+                System.out.println("Proveedor: " + textoProveedor);
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        
+        LectorConsola.pausar();
+    }
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */
     private void pendiente(String requisito) {
         System.out.println(ColoresConsola.pintar("[PENDIENTE] " + requisito, ColoresConsola.AMARILLO));

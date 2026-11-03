@@ -1,0 +1,59 @@
+# CP-JDBC-03b · Validaciones adicionales en alta de producto
+# Fecha: 03-11-2026
+# Comando: mvn exec:java → opción 7 → opción 4 → opción 1 (alta) / opción 2 (consultar)
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+
+---------- PRODUCTOS ----------
+1. Dar de alta un producto
+2. Consultar producto por código
+3. Modificar un producto
+4. Eliminar un producto
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- ALTA DE PRODUCTO ----------
+Código (máx. 12: letras, números y guion): RAT-002
+Nombre (3 a 100 caracteres): Ratón inalámbrico
+Precio (ej. 19.95): 19.95
+Stock inicial: 25
+Id de categoría: 1
+Id de proveedor: 99
+[ERROR] no existe el proveedor con id 99
+Pulsa Intro para continuar...
+
+---------- PRODUCTOS ----------
+1. Dar de alta un producto
+2. Consultar producto por código
+3. Modificar un producto
+4. Eliminar un producto
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- ALTA DE PRODUCTO ----------
+Código (máx. 12: letras, números y guion): MAL CODIGO
+Nombre (3 a 100 caracteres): AB
+Precio (ej. 19.95): -5
+Stock inicial: -1
+Id de categoría: 0
+Id de proveedor: x
+[ERROR] el código solo admite mayúsculas, números y guiones
+[ERROR] el nombre debe tener entre 3 y 100 caracteres
+[ERROR] el precio debe ser mayor que 0
+[ERROR] stock debe ser mayor o igual a 0
+[ERROR] categoriaId debe ser mayor o igual a 1
+[ERROR] proveedorId no es un número entero válido: x
+Pulsa Intro para continuar...
+
+---------- PRODUCTOS ----------
+1. Dar de alta un producto
+2. Consultar producto por código
+3. Modificar un producto
+4. Eliminar un producto
+0. Volver al menú MySQL
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: XXX-999
+No existe ningún producto con el código XXX-999
+Pulsa Intro para continuar...
