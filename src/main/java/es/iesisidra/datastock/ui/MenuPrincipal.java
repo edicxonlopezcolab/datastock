@@ -22,8 +22,10 @@ import es.iesisidra.datastock.jdbc.CategoriaDAO;
 import es.iesisidra.datastock.jdbc.ComprobadorConexion;
 import es.iesisidra.datastock.jdbc.ErroresSQL;
 import es.iesisidra.datastock.jdbc.InfoConexion;
+import es.iesisidra.datastock.jdbc.ProveedorDAO;
 import es.iesisidra.datastock.modelo.Categoria;
 import es.iesisidra.datastock.modelo.Producto;
+import es.iesisidra.datastock.modelo.Proveedor;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 
 /**
@@ -42,6 +44,7 @@ public class MenuPrincipal {
     private final SerializadorInventario serializador = new SerializadorInventario();
     private final ComprobadorConexion comprobador = new ComprobadorConexion();
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
+    private final ProveedorDAO proveedorDAO = new ProveedorDAO();
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -156,7 +159,7 @@ public class MenuPrincipal {
             {
                 case 1 -> comprobarConexion();
                 case 2 -> menuCategorias();
-                case 3 -> pendiente("RF-JDBC-02 · Proveedores");
+                case 3 -> menuProveedores();
                 case 4 -> pendiente("RF-JDBC-03 · Productos");
                 case 5 -> pendiente("RF-JDBC-04 · Consultas");
                 case 6 -> pendiente("RF-JDBC-05 · Movimientos");
@@ -419,6 +422,242 @@ public class MenuPrincipal {
             System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
         }
         
+        LectorConsola.pausar();
+    }
+
+        private void menuProveedores()
+    {
+        int opcion;
+        do
+        {
+            System.out.println("\n---------- PROVEEDORES ----------");
+            System.out.println("1. Dar de alta un proveedor");
+            System.out.println("2. Listar proveedores");
+            System.out.println("3. Modificar un proveedor");
+            System.out.println("4. Eliminar un proveedor");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 4);
+            switch (opcion)
+            {
+                case 1 -> altaProveedor();
+                case 2 -> listarProveedores();
+                case 3 -> modificarProveedor();
+                case 4 -> eliminarProveedor();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        }
+        while (opcion != 0);
+    }
+
+    private void altaProveedor()
+    {
+        System.out.println("\n---------- ALTA DE PROVEEDOR ----------");
+        int id = LectorConsola.leerEntero("Id del proveedor: ");
+        if (id <= 0)
+        {
+            error("el id debe ser un entero positivo");
+            return;
+        }
+        String nombre = LectorConsola.leerTexto("Nombre: ").trim();
+        if (!nombreProveedorValido(nombre))
+        {
+            return;
+        }
+        String email = LectorConsola.leerTexto("Email (opcional, Intro para dejarlo vacío): ").trim();
+        if (email.isEmpty())
+        {
+            email = null;
+        }
+        else if (!emailValido(email))
+        {
+            return;
+        }
+        try
+        {
+            proveedorDAO.insertar(new Proveedor(id, nombre, email));
+            System.out.println(ColoresConsola.pintar("[OK] Proveedor creado.", ColoresConsola.VERDE));
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void listarProveedores()
+    {
+        System.out.println("\n---------- LISTADO DE PROVEEDORES ----------");
+        try
+        {
+            List<Proveedor> proveedores = proveedorDAO.listar();
+            if (proveedores.isEmpty())
+            {
+                System.out.println("No hay proveedores registrados.");
+            }
+            else
+            {
+                for (Proveedor p : proveedores)
+                {
+                    String email = p.getEmail() == null ? "—" : p.getEmail();
+                    System.out.println(p.getId() + " | " + p.getNombre() + " | " + email);
+                }
+                System.out.println("Total: " + proveedores.size());
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void modificarProveedor()
+    {
+        System.out.println("\n---------- MODIFICAR PROVEEDOR ----------");
+        int id = LectorConsola.leerEntero("Id del proveedor: ");
+        if (id <= 0)
+        {
+            error("el id debe ser un entero positivo");
+            return;
+        }
+        try
+        {
+            Proveedor actual = proveedorDAO.buscarPorId(id);
+            if (actual == null)
+            {
+                error("no existe ningún proveedor con id " + id);
+                return;
+            }
+            String emailActual = actual.getEmail() == null ? "—" : actual.getEmail();
+            System.out.println("Nombre actual: " + actual.getNombre());
+            System.out.println("Email actual: " + emailActual);
+            System.out.println(ColoresConsola.pintar("Pulsa Intro para conservar un dato. Escribe «-» en el email para dejarlo vacío.", ColoresConsola.AMARILLO));
+
+            String nombre = LectorConsola.leerTexto("Nuevo nombre: ").trim();
+            if (nombre.isEmpty())
+            {
+                nombre = actual.getNombre();
+            }
+            else if (!nombreProveedorValido(nombre))
+            {
+                return;
+            }
+
+            String email = LectorConsola.leerTexto("Nuevo email: ").trim();
+            if (email.isEmpty())
+            {
+                email = actual.getEmail();
+            }
+            else if (email.equals("-"))
+            {
+                email = null;
+            }
+            else if (!emailValido(email))
+            {
+                return;
+            }
+
+            String emailNuevo = email == null ? "—" : email;
+            if (!LectorConsola.confirmar("¿Guardar «" + nombre + "» con email «" + emailNuevo + "»?"))
+            {
+                System.out.println(ColoresConsola.pintar("Modificación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (proveedorDAO.actualizar(new Proveedor(id, nombre, email)))
+            {
+                System.out.println(ColoresConsola.pintar("[OK] Proveedor actualizado.", ColoresConsola.VERDE));
+            }
+            else
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] el proveedor ya no existe", ColoresConsola.ROJO));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void eliminarProveedor()
+    {
+        System.out.println("\n---------- ELIMINAR PROVEEDOR ----------");
+        int id = LectorConsola.leerEntero("Id del proveedor: ");
+        if (id <= 0)
+        {
+            error("el id debe ser un entero positivo");
+            return;
+        }
+        try
+        {
+            Proveedor actual = proveedorDAO.buscarPorId(id);
+            if (actual == null)
+            {
+                error("no existe ningún proveedor con id " + id);
+                return;
+            }
+            String email = actual.getEmail() == null ? "—" : actual.getEmail();
+            System.out.println("Proveedor: " + actual.getId() + " | " + actual.getNombre() + " | " + email);
+            if (!LectorConsola.confirmar("¿Eliminar este proveedor?"))
+            {
+                System.out.println(ColoresConsola.pintar("Eliminación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (proveedorDAO.eliminar(id))
+            {
+                System.out.println(ColoresConsola.pintar("[OK] Proveedor eliminado.", ColoresConsola.VERDE));
+            }
+            else
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] el proveedor ya no existe", ColoresConsola.ROJO));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    /** Comprueba el nombre de un proveedor (obligatorio, máximo 100) y avisa si no vale. */
+    private boolean nombreProveedorValido(String nombre)
+    {
+        if (nombre.isEmpty())
+        {
+            error("el nombre no puede estar vacío");
+            return false;
+        }
+        if (nombre.length() > 100)
+        {
+            error("el nombre no puede superar los 100 caracteres");
+            return false;
+        }
+        return true;
+    }
+
+    /** Comprueba el formato básico de un email (algo@algo.algo, máximo 120) y avisa si no vale. */
+    private boolean emailValido(String email)
+    {
+        if (email.length() > 120)
+        {
+            error("el email no puede superar los 120 caracteres");
+            return false;
+        }
+        if (!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+"))
+        {
+            error("el email no tiene un formato válido (ejemplo: ventas@empresa.es)");
+            return false;
+        }
+        return true;
+    }
+
+    /** Muestra un error en rojo y hace la pausa. */
+    private void error(String mensaje)
+    {
+        System.out.println(ColoresConsola.pintar("[ERROR] " + mensaje, ColoresConsola.ROJO));
         LectorConsola.pausar();
     }
 

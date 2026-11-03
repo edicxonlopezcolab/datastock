@@ -1,0 +1,35 @@
+# CP-JDBC-04 · Duplicados de proveedor (ID repetido y email repetido)
+# Fecha: 03-11-2026
+# Comando: mvn exec:java → opción 7 → opción 3 → opción 1
+# Entorno: Linux (D22-12), MySQL 8.0.46, JDK 21
+# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+
+---------- PROVEEDORES ----------
+1. Dar de alta un proveedor
+2. Listar proveedores
+3. Modificar un proveedor
+4. Eliminar un proveedor
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- ALTA DE PROVEEDOR ----------
+Id del proveedor: 1
+Nombre: Otro
+Email (opcional, Intro para dejarlo vacío): 
+[ERROR] ya existe un registro con ese identificador
+Pulsa Intro para continuar...
+
+---------- PROVEEDORES ----------
+1. Dar de alta un proveedor
+2. Listar proveedores
+3. Modificar un proveedor
+4. Eliminar un proveedor
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- ALTA DE PROVEEDOR ----------
+Id del proveedor: 3
+Nombre: Otro
+Email (opcional, Intro para dejarlo vacío): ventas@distribuciones.example
+[ERROR] ya existe un registro con ese valor en un campo que no admite repetidos (nombre o email)
+Pulsa Intro para continuar...

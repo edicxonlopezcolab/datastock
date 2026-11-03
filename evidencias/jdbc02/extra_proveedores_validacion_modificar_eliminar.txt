@@ -1,0 +1,85 @@
+# CP-JDBC-02g · Proveedores: validación de email, modificación y eliminación
+# Fecha: 03-11-2026
+# Comando: mvn exec:java → opción 7 → opción 3
+# Entorno: Linux (D22-12), MySQL 8.0.46, JDK 21
+# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+
+---------- PROVEEDORES ----------
+1. Dar de alta un proveedor
+2. Listar proveedores
+3. Modificar un proveedor
+4. Eliminar un proveedor
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- ALTA DE PROVEEDOR ----------
+Id del proveedor: 3
+Nombre: Otro
+Email (opcional, Intro para dejarlo vacío): correo-malo
+[ERROR] el email no tiene un formato válido (ejemplo: ventas@empresa.es)
+Pulsa Intro para continuar...
+
+---------- PROVEEDORES ----------
+1. Dar de alta un proveedor
+2. Listar proveedores
+3. Modificar un proveedor
+4. Eliminar un proveedor
+0. Volver al menú MySQL
+Selecciona una opción: 3
+
+---------- MODIFICAR PROVEEDOR ----------
+Id del proveedor: 2
+Nombre actual: Suministros Centro
+Email actual: —
+Pulsa Intro para conservar un dato. Escribe «-» en el email para dejarlo vacío.
+Nuevo nombre: 
+Nuevo email: info@suministros.example
+¿Guardar «Suministros Centro» con email «info@suministros.example»? (S/N): S
+[OK] Proveedor actualizado.
+Pulsa Intro para continuar...
+
+---------- PROVEEDORES ----------
+1. Dar de alta un proveedor
+2. Listar proveedores
+3. Modificar un proveedor
+4. Eliminar un proveedor
+0. Volver al menú MySQL
+Selecciona una opción: 3
+
+---------- MODIFICAR PROVEEDOR ----------
+Id del proveedor: 2
+Nombre actual: Suministros Centro
+Email actual: info@suministros.example
+Pulsa Intro para conservar un dato. Escribe «-» en el email para dejarlo vacío.
+Nuevo nombre: Suministros del Centro
+Nuevo email: 
+¿Guardar «Suministros del Centro» con email «info@suministros.example»? (S/N): S
+[OK] Proveedor actualizado.
+Pulsa Intro para continuar...
+
+---------- PROVEEDORES ----------
+1. Dar de alta un proveedor
+2. Listar proveedores
+3. Modificar un proveedor
+4. Eliminar un proveedor
+0. Volver al menú MySQL
+Selecciona una opción: 4
+
+---------- ELIMINAR PROVEEDOR ----------
+Id del proveedor: 2
+Proveedor: 2 | Suministros del Centro | info@suministros.example
+¿Eliminar este proveedor? (S/N): s
+[OK] Proveedor eliminado.
+Pulsa Intro para continuar... 
+
+---------- PROVEEDORES ----------
+1. Dar de alta un proveedor
+2. Listar proveedores
+3. Modificar un proveedor
+4. Eliminar un proveedor
+0. Volver al menú MySQL
+Selecciona una opción: 2
+
+---------- LISTADO DE PROVEEDORES ----------
+1 | Distribuciones Norte | ventas@distribuciones.example
+Total: 1
