@@ -62,6 +62,43 @@ public class ProductoDAO
         }
     }
 
+        /**
+     * Modifica nombre, precio, categoría y proveedor de un producto.
+     * El código y el stock no se modifican: el stock solo cambia con movimientos.
+     * @param p producto con el código existente y los datos nuevos
+     * @return true si se actualizó, false si no existe ningún producto con ese código
+     * @throws SQLException si la categoría o el proveedor no existen, o falla la conexión
+     */
+    public boolean actualizar(Producto p) throws SQLException
+    {
+        String sql = "UPDATE producto SET nombre = ?, precio = ?, categoria_id = ?, proveedor_id = ? WHERE codigo = ?";
+        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setString(1, p.getNombre());
+            ps.setBigDecimal(2, p.getPrecio());
+            ps.setInt(3, p.getCategoriaId());
+            ps.setInt(4, p.getProveedorId());
+            ps.setString(5, p.getCodigo());
+            return ps.executeUpdate() == 1;
+        }
+    }
+
+    /**
+     * Elimina un producto por su código.
+     * @param codigo código del producto
+     * @return true si se eliminó, false si no existía
+     * @throws SQLException si tiene movimientos asociados (clave foránea) o falla la conexión
+     */
+    public boolean eliminar(String codigo) throws SQLException
+    {
+        String sql = "DELETE FROM producto WHERE codigo = ?";
+        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setString(1, codigo);
+            return ps.executeUpdate() == 1;
+        }
+    }
+
     /**
      * Crea un Producto a partir de la fila actual del ResultSet.
      * @param rs ResultSet posicionado en una fila válida.

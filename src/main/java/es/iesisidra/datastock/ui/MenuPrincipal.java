@@ -681,8 +681,8 @@ public class MenuPrincipal {
             {
                 case 1 -> altaProducto();
                 case 2 -> consultarProducto();
-                case 3 -> pendiente("Modificar producto");
-                case 4 -> pendiente("Eliminar producto");
+                case 3 -> modificarProducto();
+                case 4 -> eliminarProducto();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -797,6 +797,134 @@ public class MenuPrincipal {
         
         LectorConsola.pausar();
     }
+
+    private void modificarProducto()
+    {
+        System.out.println("\n---------- MODIFICAR PRODUCTO ----------");
+        String codigo = ValidadorProducto.normalizarCodigo(LectorConsola.leerTexto("Código del producto: "));
+        if (codigo.isEmpty())
+        {
+            error("el código no puede estar vacío");
+            return;
+        }
+        try
+        {
+            Producto actual = productoDAO.buscarPorCodigo(codigo);
+            if (actual == null)
+            {
+                error("no existe ningún producto con el código " + codigo);
+                return;
+            }
+            System.out.println("Nombre actual: " + actual.getNombre());
+            System.out.println("Precio actual: " + actual.getPrecio() + " €");
+            System.out.println("Categoría actual: " + actual.getCategoriaId());
+            System.out.println("Proveedor actual: " + actual.getProveedorId());
+            System.out.println("Stock: " + actual.getStock() + " (no se modifica aquí: usa el menú de movimientos)");
+            System.out.println(ColoresConsola.pintar("Pulsa Intro para conservar un dato.", ColoresConsola.AMARILLO));
+
+            // Intro = conservar: si viene vacío, se usa el valor actual como texto
+            String nombre = conservar(LectorConsola.leerTexto("Nuevo nombre: "), actual.getNombre());
+            String precio = conservar(LectorConsola.leerTexto("Nuevo precio: "), actual.getPrecio().toPlainString());
+            String categoria = conservar(LectorConsola.leerTexto("Nueva categoría (id): "), String.valueOf(actual.getCategoriaId()));
+            String proveedor = conservar(LectorConsola.leerTexto("Nuevo proveedor (id): "), String.valueOf(actual.getProveedorId()));
+            String stock = String.valueOf(actual.getStock());
+
+            // Mismas reglas que en el alta, sin escribir validaciones nuevas
+            List<String> errores = validador.validar(codigo, nombre, precio, stock, categoria, proveedor);
+            if (!errores.isEmpty())
+            {
+                for (String e : errores)
+                {
+                    System.out.println(ColoresConsola.pintar("[ERROR] " + e, ColoresConsola.ROJO));
+                }
+                LectorConsola.pausar();
+                return;
+            }
+            Producto nuevo = validador.crear(codigo, nombre, precio, stock, categoria, proveedor);
+
+            if (categoriaDAO.buscarPorId(nuevo.getCategoriaId()) == null)
+            {
+                error("no existe la categoría con id " + nuevo.getCategoriaId());
+                return;
+            }
+            if (proveedorDAO.buscarPorId(nuevo.getProveedorId()) == null)
+            {
+                error("no existe el proveedor con id " + nuevo.getProveedorId());
+                return;
+            }
+
+            System.out.println("Quedará: " + nuevo.getNombre() + " | " + nuevo.getPrecio() + " € | categoría "
+                    + nuevo.getCategoriaId() + " | proveedor " + nuevo.getProveedorId());
+            if (!LectorConsola.confirmar("¿Guardar los cambios?"))
+            {
+                System.out.println(ColoresConsola.pintar("Modificación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (productoDAO.actualizar(nuevo))
+            {
+                System.out.println(ColoresConsola.pintar("[OK] Producto actualizado.", ColoresConsola.VERDE));
+            }
+            else
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] el producto ya no existe", ColoresConsola.ROJO));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void eliminarProducto()
+    {
+        System.out.println("\n---------- ELIMINAR PRODUCTO ----------");
+        String codigo = ValidadorProducto.normalizarCodigo(LectorConsola.leerTexto("Código del producto: "));
+        if (codigo.isEmpty())
+        {
+            error("el código no puede estar vacío");
+            return;
+        }
+        try
+        {
+            Producto actual = productoDAO.buscarPorCodigo(codigo);
+            if (actual == null)
+            {
+                error("no existe ningún producto con el código " + codigo);
+                return;
+            }
+            System.out.println("Producto: " + actual.getCodigo() + " | " + actual.getNombre() + " | "
+                    + actual.getPrecio() + " € | stock " + actual.getStock());
+            if (!LectorConsola.confirmar("¿Eliminar este producto?"))
+            {
+                System.out.println(ColoresConsola.pintar("Eliminación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+            if (productoDAO.eliminar(codigo))
+            {
+                System.out.println(ColoresConsola.pintar("[OK] Producto eliminado.", ColoresConsola.VERDE));
+            }
+            else
+            {
+                System.out.println(ColoresConsola.pintar("[ERROR] el producto ya no existe", ColoresConsola.ROJO));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    /** Devuelve el texto escrito sin espacios extremos, o el valor actual si se pulsó Intro. */
+    private String conservar(String escrito, String actual)
+    {
+        String limpio = escrito.trim();
+        return limpio.isEmpty() ? actual : limpio;
+    }
+
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */
     private void pendiente(String requisito) {
         System.out.println(ColoresConsola.pintar("[PENDIENTE] " + requisito, ColoresConsola.AMARILLO));
