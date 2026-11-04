@@ -26,6 +26,7 @@ public final class ErroresSQL
                         : "ya existe un registro con ese valor en un campo que no admite repetidos (nombre o email)";
             case 1451 -> "no se puede eliminar: tiene registros asociados (productos o movimientos) que dependen de él";
             case 1452 -> "la categoría o el proveedor indicado no existe (integridad referencial)";
+            case 1644 -> "el procedimiento rechazó la operación: " + e.getMessage();
             default -> estado.startsWith("08")
                     ? "no se puede conectar con el servidor MySQL; comprueba que está arrancado"
                     : e.getMessage();

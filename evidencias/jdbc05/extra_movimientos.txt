@@ -1,0 +1,113 @@
+# CP-JDBC-05b · Validaciones y cancelaciones en el menú de movimientos
+# Fecha: 04-11-2026
+# Comando: mvn exec:java → opción 7 → opción 6 → opciones 1 y 2
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+# Estado de partida: TEC-001 con stock 11 y COUNT(*) de movimiento_stock = 2.
+# Ninguna de estas operaciones modifica el stock ni crea movimientos.
+
+# --- Prueba 4: producto inexistente (valida el menú, no llega al procedimiento) ---
+---------- MOVIMIENTOS DE STOCK ----------
+1. Registrar una ENTRADA de stock
+2. Registrar una SALIDA de stock
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- REGISTRAR ENTRADA ----------
+Código del producto: ZZZ-999
+[ERROR] no existe ningún producto con el código ZZZ-999
+Pulsa Intro para continuar...
+
+# --- Prueba 5: cancelación con N (no se invoca al procedimiento) ---
+---------- MOVIMIENTOS DE STOCK ----------
+1. Registrar una ENTRADA de stock
+2. Registrar una SALIDA de stock
+0. Volver al menú MySQL
+Selecciona una opción: 2
+
+---------- REGISTRAR SALIDA ----------
+Código del producto: TEC-001
+Producto: Teclado mecánico
+Stock actual: 11
+Cantidad: 2
+¿Registrar SALIDA de 2 unidades? (S/N): n
+Operación cancelada.
+Pulsa Intro para continuar...
+
+# --- Prueba 6: cantidad no numérica (leerEntero repite la pregunta) ---
+---------- MOVIMIENTOS DE STOCK ----------
+1. Registrar una ENTRADA de stock
+2. Registrar una SALIDA de stock
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- REGISTRAR ENTRADA ----------
+Código del producto: TEC-001
+Producto: Teclado mecánico
+Stock actual: 11
+Cantidad: abc
+Introduce un número entero válido.
+Cantidad: 1
+¿Registrar ENTRADA de 1 unidades? (S/N): n
+Operación cancelada.
+Pulsa Intro para continuar...
+
+# --- Prueba 7: cantidad 0 y -3 (valida el menú antes del procedimiento) ---
+---------- MOVIMIENTOS DE STOCK ----------
+1. Registrar una ENTRADA de stock
+2. Registrar una SALIDA de stock
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- REGISTRAR ENTRADA ----------
+Código del producto: TEC-001
+Producto: Teclado mecánico
+Stock actual: 11
+Cantidad: 0
+[ERROR] la cantidad debe ser un entero positivo
+Pulsa Intro para continuar...
+
+---------- MOVIMIENTOS DE STOCK ----------
+1. Registrar una ENTRADA de stock
+2. Registrar una SALIDA de stock
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- REGISTRAR ENTRADA ----------
+Código del producto: TEC-001
+Producto: Teclado mecánico
+Stock actual: 11
+Cantidad: -3
+[ERROR] la cantidad debe ser un entero positivo
+Pulsa Intro para continuar...
+
+# --- Prueba 8: código vacío (valida el menú antes del procedimiento) ---
+---------- MOVIMIENTOS DE STOCK ----------
+1. Registrar una ENTRADA de stock
+2. Registrar una SALIDA de stock
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- REGISTRAR ENTRADA ----------
+Código del producto: 
+[ERROR] el código no puede estar vacío
+Pulsa Intro para continuar...
+
+# ==========================================
+# Comprobación en MySQL tras las pruebas 4-8
+# ==========================================
+mysql> SELECT stock FROM producto WHERE codigo = 'TEC-001';
++-------+
+| stock |
++-------+
+|    11 |
++-------+
+1 row in set (0.00 sec)
+
+mysql> SELECT COUNT(*) FROM movimiento_stock;
++----------+
+| COUNT(*) |
++----------+
+|        2 |
++----------+
+1 row in set (0.00 sec)

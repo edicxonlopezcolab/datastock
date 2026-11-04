@@ -23,10 +23,12 @@ import es.iesisidra.datastock.jdbc.CategoriaDAO;
 import es.iesisidra.datastock.jdbc.ComprobadorConexion;
 import es.iesisidra.datastock.jdbc.ErroresSQL;
 import es.iesisidra.datastock.jdbc.InfoConexion;
+import es.iesisidra.datastock.jdbc.MovimientoDAO;
 import es.iesisidra.datastock.jdbc.ProductoDAO;
 import es.iesisidra.datastock.jdbc.ProductoDetalle;
 import es.iesisidra.datastock.jdbc.ProveedorDAO;
 import es.iesisidra.datastock.modelo.Categoria;
+import es.iesisidra.datastock.modelo.MovimientoStock;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.modelo.Proveedor;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
@@ -50,6 +52,8 @@ public class MenuPrincipal {
     private final ProveedorDAO proveedorDAO = new ProveedorDAO();
     private final ProductoDAO productoDAO = new ProductoDAO();
     private final ValidadorProducto validador = new ValidadorProducto();
+    private final MovimientoDAO movimientoDAO = new MovimientoDAO();
+
 
     /** @param inventario colección común de productos de esta ejecución. */
     public MenuPrincipal(Inventario inventario) { this.inventario = inventario; }
@@ -167,7 +171,7 @@ public class MenuPrincipal {
                 case 3 -> menuProveedores();
                 case 4 -> menuProductos();
                 case 5 -> menuConsultasMySQL();
-                case 6 -> pendiente("RF-JDBC-05 · Movimientos");
+                case 6 -> menuMovimientos();
                 case 7 -> pendiente("RF-JDBC-06 · Historial");
                 case 8 -> pendiente("RF-JDBC-07 · Importar de memoria");
                 case 9 -> pendiente("RF-JDBC-08 · Transacciones");
@@ -1021,6 +1025,82 @@ public class MenuPrincipal {
                 System.out.println(d.getCodigo() + " | " + d.getNombre() + " | " + d.getPrecio() + " €" + " | " + "stock " + d.getStock() + " | " + d.getCategoria() + " | " + d.getProveedor());
             }
             System.out.println("\nTotal: " + lista.size() + " productos");
+        }
+    }
+
+    private void menuMovimientos()
+    {
+        int opcion;
+        do
+        {
+            System.out.println("\n---------- MOVIMIENTOS DE STOCK ----------");
+            System.out.println("1. Registrar una ENTRADA de stock");
+            System.out.println("2. Registrar una SALIDA de stock");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 2);
+            switch (opcion)
+            {
+                case 1 -> registrarMovimiento("ENTRADA");
+                case 2 -> registrarMovimiento("SALIDA");
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        }
+        while (opcion != 0);
+    }
+
+    private void registrarMovimiento(String tipo)
+    {
+        System.out.println("\n---------- REGISTRAR " + tipo + " ----------");
+
+        String codigo = ValidadorProducto.normalizarCodigo(LectorConsola.leerTexto("Código del producto: "));
+        if (codigo.isEmpty())
+        {
+            error("el código no puede estar vacío");
+            return;
+        }
+
+        try
+        {
+            Producto p = productoDAO.buscarPorCodigo(codigo);
+            if (p == null)
+            {
+                error("no existe ningún producto con el código " + codigo);
+                return;
+            }
+            System.out.println("Producto: " + p.getNombre());
+            System.out.println("Stock actual: " + p.getStock());
+            int cantidad = LectorConsola.leerEntero("Cantidad: ");
+            if (cantidad <= 0)
+            {
+                error("la cantidad debe ser un entero positivo");
+                return;
+            }
+            if (!LectorConsola.confirmar("¿Registrar " + tipo + " de " + cantidad + " unidades?"))
+            {
+                System.out.println(ColoresConsola.pintar("Operación cancelada.", ColoresConsola.AMARILLO));
+                LectorConsola.pausar();
+                return;
+            }
+            movimientoDAO.registrar(codigo, tipo, cantidad);
+            MovimientoStock m = movimientoDAO.ultimoDeProducto(codigo);
+            if (m != null)
+            {
+                System.out.println(ColoresConsola.pintar(
+                    "[OK] " + tipo + " registrada: stock " + m.getStockAnterior()
+                    + " → " + m.getStockPosterior()
+                    + " (cantidad " + m.getCantidad() + ")", ColoresConsola.VERDE));
+            }
+            else
+            {
+                System.out.println(ColoresConsola.pintar(
+                    "[OK] Movimiento registrado.", ColoresConsola.VERDE));
+            }
+            LectorConsola.pausar();
+        }
+        catch (SQLException e)
+        {
+            error(ErroresSQL.explicar(e));
         }
     }
 
