@@ -6,6 +6,8 @@ import es.iesisidra.datastock.modelo.Producto;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.sql.PreparedStatement;
 
 /**
@@ -15,6 +17,11 @@ import java.sql.PreparedStatement;
  */
 public class ProductoDAO 
 {
+    private static final String SELECT_DETALLE =
+        "SELECT p.codigo, p.nombre, p.precio, p.stock, c.nombre AS categoria, v.nombre AS proveedor "
+      + "FROM producto p "
+      + "JOIN categoria c ON c.id = p.categoria_id "
+      + "JOIN proveedor v ON v.id = p.proveedor_id ";
     /**
      * Busca un producto por su código.
      * @param codigo Código exacto del producto (ej. TEC-001).
@@ -100,6 +107,78 @@ public class ProductoDAO
     }
 
     /**
+     * Lista todos los productos con el nombre de su categoría y su proveedor, ordenados por código.
+     * @return lista de productos (vacía si no hay ninguno)
+     * @throws SQLException si no se puede conectar o consultar
+     */
+    public List<ProductoDetalle> listarDetalle() throws SQLException
+    {
+        String sql = SELECT_DETALLE + "ORDER BY p.codigo";
+        List<ProductoDetalle> lista = new ArrayList<>();
+
+        try (Connection con = ConexionBD.abrir(); PreparedStatement ps = con.prepareStatement(sql);ResultSet rs = ps.executeQuery())
+        {
+            while (rs.next())
+            {
+                lista.add(crearDetalle(rs));
+            }
+        }
+        return lista;
+    }
+
+    /**
+     * Busca productos cuyo nombre contenga el texto indicado (búsqueda parcial con LIKE).
+     * @param texto parte del nombre a buscar
+     * @return productos encontrados, ordenados por código
+     * @throws SQLException si no se puede conectar o consultar
+     */
+    public List<ProductoDetalle> buscarPorNombre(String texto) throws SQLException
+    {
+        String sql = SELECT_DETALLE + "WHERE p.nombre LIKE ? ORDER BY p.codigo";
+        List<ProductoDetalle> lista = new ArrayList<>();
+
+        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setString(1, "%" + texto + "%");
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    lista.add(crearDetalle(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+    /**
+     * Devuelve los productos con stock inferior al umbral, ordenados por stock y código.
+     * @param umbral valor de stock; se incluyen los productos con stock menor que él
+     * @return productos encontrados
+     * @throws SQLException si no se puede conectar o consultar
+     */
+    public List<ProductoDetalle> stockBajo(int umbral) throws SQLException
+    {
+        String sql = SELECT_DETALLE + "WHERE p.stock < ? ORDER BY p.stock, p.codigo";
+        List<ProductoDetalle> lista = new ArrayList<>();
+
+        try (Connection con = ConexionBD.abrir(); PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setInt(1, umbral);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    lista.add(crearDetalle(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+    /**
      * Crea un Producto a partir de la fila actual del ResultSet.
      * @param rs ResultSet posicionado en una fila válida.
      * @return Producto con los datos de esa fila.
@@ -114,6 +193,18 @@ public class ProductoDAO
             rs.getInt("stock"),
             rs.getInt("categoria_id"),
             rs.getInt("proveedor_id")
+        );
+    }
+
+    private ProductoDetalle crearDetalle(ResultSet rs) throws SQLException
+    {
+        return new ProductoDetalle(
+            rs.getString("codigo"),
+            rs.getString("nombre"),
+            rs.getBigDecimal("precio"),
+            rs.getInt("stock"),
+            rs.getString("categoria"),
+            rs.getString("proveedor")
         );
     }
 }

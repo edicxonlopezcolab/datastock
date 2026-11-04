@@ -24,6 +24,7 @@ import es.iesisidra.datastock.jdbc.ComprobadorConexion;
 import es.iesisidra.datastock.jdbc.ErroresSQL;
 import es.iesisidra.datastock.jdbc.InfoConexion;
 import es.iesisidra.datastock.jdbc.ProductoDAO;
+import es.iesisidra.datastock.jdbc.ProductoDetalle;
 import es.iesisidra.datastock.jdbc.ProveedorDAO;
 import es.iesisidra.datastock.modelo.Categoria;
 import es.iesisidra.datastock.modelo.Producto;
@@ -165,7 +166,7 @@ public class MenuPrincipal {
                 case 2 -> menuCategorias();
                 case 3 -> menuProveedores();
                 case 4 -> menuProductos();
-                case 5 -> pendiente("RF-JDBC-04 · Consultas");
+                case 5 -> menuConsultasMySQL();
                 case 6 -> pendiente("RF-JDBC-05 · Movimientos");
                 case 7 -> pendiente("RF-JDBC-06 · Historial");
                 case 8 -> pendiente("RF-JDBC-07 · Importar de memoria");
@@ -923,6 +924,104 @@ public class MenuPrincipal {
     {
         String limpio = escrito.trim();
         return limpio.isEmpty() ? actual : limpio;
+    }
+
+    private void menuConsultasMySQL()
+    {
+        int opcion;
+        do
+        {
+            System.out.println("\n---------- CONSULTAS MYSQL ----------");
+            System.out.println("1. Listar productos con categoría y proveedor");
+            System.out.println("2. Buscar producto por código");
+            System.out.println("3. Buscar productos por nombre");
+            System.out.println("4. Productos con stock inferior a un umbral");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 4);
+            switch (opcion)
+            {
+                case 1 -> listarProductosMySQL();
+                case 2 -> consultarProducto();
+                case 3 -> buscarPorNombreMySQL();
+                case 4 -> stockBajoMySQL();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        }
+        while (opcion != 0);
+    }
+
+    private void listarProductosMySQL()
+    {
+        System.out.println("\n---------- PRODUCTOS EN MYSQL ----------"); 
+        try
+        {
+            List<ProductoDetalle> lista = productoDAO.listarDetalle();
+            mostrarDetalles(lista);
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }   
+        LectorConsola.pausar();
+    }
+
+    private void buscarPorNombreMySQL()
+    {
+        System.out.println("\n---------- BUSCAR POR NOMBRE ----------");
+        String texto = LectorConsola.leerTexto("Texto a buscar en el nombre: ").trim();  
+        if (texto.isEmpty())
+        {
+            error("el texto no puede estar vacío");
+            return;
+        }
+        try
+        {
+            List<ProductoDetalle> lista = productoDAO.buscarPorNombre(texto);
+            mostrarDetalles(lista);
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void stockBajoMySQL()
+    {
+        System.out.println("\n---------- STOCK BAJO ----------");
+        int umbral = LectorConsola.leerEntero("Mostrar productos con stock menor que: ");
+        if (umbral < 1)
+        {
+            error("el umbral debe ser un entero positivo");
+            return;
+        }
+        try
+        {
+            List<ProductoDetalle> lista = productoDAO.stockBajo(umbral);
+            mostrarDetalles(lista);
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void mostrarDetalles(List<ProductoDetalle> lista) 
+    {
+        if (lista.isEmpty())
+        {
+            System.out.println("Sin resultados.");
+        }
+        else
+        { 
+            for (ProductoDetalle d : lista) 
+            {
+                System.out.println(d.getCodigo() + " | " + d.getNombre() + " | " + d.getPrecio() + " €" + " | " + "stock " + d.getStock() + " | " + d.getCategoria() + " | " + d.getProveedor());
+            }
+            System.out.println("\nTotal: " + lista.size() + " productos");
+        }
     }
 
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */

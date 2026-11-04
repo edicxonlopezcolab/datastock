@@ -1,0 +1,22 @@
+# CP-JDBC-09 · Listado de productos con JOIN (categoría y proveedor)
+# Fecha: 03-11-2026
+# Comando: mvn exec:java → opción 7 → opción 5 → opción 1
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+
+---------- CONSULTAS MYSQL ----------
+1. Listar productos con categoría y proveedor
+2. Buscar producto por código
+3. Buscar productos por nombre
+4. Productos con stock inferior a un umbral
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- PRODUCTOS EN MYSQL ----------
+AUR-004|Auriculares con micro|29.90 €|stock 7|Audio|PcPartes
+MON-003|Monitor 24 pulgadas|149.99 €|stock 3|Monitores|PcPartes
+RAT-002|Ratón inalámbrico|19.95 €|stock 25|Periféricos|PcPartes
+TEC-001|Teclado mecánico|44.90 €|stock 10|Periféricos|PcPartes
+
+Total: 4 productos
+Pulsa Intro para continuar...
