@@ -172,7 +172,7 @@ public class MenuPrincipal {
                 case 4 -> menuProductos();
                 case 5 -> menuConsultasMySQL();
                 case 6 -> menuMovimientos();
-                case 7 -> pendiente("RF-JDBC-06 · Historial");
+                case 7 -> menuHistorial();
                 case 8 -> pendiente("RF-JDBC-07 · Importar de memoria");
                 case 9 -> pendiente("RF-JDBC-08 · Transacciones");
                 case 0 -> { }
@@ -1102,6 +1102,111 @@ public class MenuPrincipal {
         {
             error(ErroresSQL.explicar(e));
         }
+    }
+
+    private void menuHistorial()
+    {
+        int opcion;
+        do
+        {
+            System.out.println("\n---------- HISTORIAL DE MOVIMIENTOS ----------");
+            System.out.println("1. Consultar todos los movimientos");
+            System.out.println("2. Consultar movimientos de un producto");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 2);
+            switch (opcion)
+            {
+                case 1 -> consultarTodosMovimientos();
+                case 2 -> consultarMovimientosProducto();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        }
+        while (opcion != 0);
+    }
+
+    private void consultarTodosMovimientos()
+    {
+        System.out.println("\n---------- TODOS LOS MOVIMIENTOS ----------");
+        try
+        {
+            List<MovimientoStock> lista = movimientoDAO.listarTodos();
+            if (lista.isEmpty())
+            {
+                System.out.println(ColoresConsola.pintar("[AVISO] No hay movimientos registrados.", ColoresConsola.AMARILLO));
+            }
+            else
+            {
+                mostrarMovimientos(lista);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void consultarMovimientosProducto()
+    {
+        System.out.println("\n---------- MOVIMIENTOS DE UN PRODUCTO ----------");
+        
+        String codigo = ValidadorProducto.normalizarCodigo(
+                LectorConsola.leerTexto("Código del producto: "));
+        if (codigo.isEmpty())
+        {
+            error("el código no puede estar vacío");
+            return;
+        }
+        try
+        {
+            Producto p = productoDAO.buscarPorCodigo(codigo);
+            if (p == null)
+            {
+                error("no existe ningún producto con el código " + codigo);
+                return;
+            }
+            List<MovimientoStock> lista = movimientoDAO.listarPorProducto(codigo);
+            
+            if (lista.isEmpty())
+            {
+                System.out.println(ColoresConsola.pintar("[AVISO] El producto existe pero no tiene movimientos registrados.", ColoresConsola.AMARILLO));
+            }
+            else
+            {
+                mostrarMovimientos(lista);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar("[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
+
+    private void mostrarMovimientos(List<MovimientoStock> lista)
+    {
+        String separador = "-----------------------------------------------------------------------------------";
+        System.out.println(separador);
+        System.out.printf("%-5s | %-19s | %-12s | %-7s | %5s | %8s | %9s%n",
+                "ID", "FECHA/HORA", "PRODUCTO", "TIPO", "CANT.", "ANTERIOR", "POSTERIOR");
+        System.out.println(separador);
+        for (MovimientoStock m : lista)
+        {
+            String fechaFormateada = m.getFecha().toString().replace('T', ' ');
+            
+            System.out.printf("%-5d | %-19s | %-12s | %-7s | %5d | %8d | %9d%n",
+                    m.getId(),
+                    fechaFormateada,
+                    m.getProductoCodigo(),
+                    m.getTipo(),
+                    m.getCantidad(),
+                    m.getStockAnterior(),
+                    m.getStockPosterior());
+        }
+        
+        System.out.println(separador);
+        System.out.println("Total: " + lista.size() + " movimientos.");
     }
 
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */

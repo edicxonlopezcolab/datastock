@@ -1,0 +1,69 @@
+# CP-JDBC-15 · Historial completo y filtrado por producto
+# Fecha: 05-11-2026
+# Comando: mvn exec:java → opción 7 → opción 7
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
+# 
+# --- ESTADO DE PARTIDA (pruebas en 7.6) ---
+# Entrada RAT-002 (5) -> stock 25 → 30 (movimiento 3)
+# Entrada TEC-001 (1) -> stock 11 → 12 (movimiento 4)
+
+# --- PRUEBA 1: Consultar todos los movimientos ---
+---------- HISTORIAL DE MOVIMIENTOS ----------
+1. Consultar todos los movimientos
+2. Consultar movimientos de un producto
+0. Volver al menú MySQL
+Selecciona una opción: 1
+
+---------- TODOS LOS MOVIMIENTOS ----------
+-----------------------------------------------------------------------------------
+ID    | FECHA/HORA          | PRODUCTO     | TIPO    | CANT. | ANTERIOR | POSTERIOR
+-----------------------------------------------------------------------------------
+1     | 2026-11-04 11:04:18 | TEC-001      | ENTRADA |     5 |       10 |        15
+2     | 2026-11-04 11:06:21 | TEC-001      | SALIDA  |     4 |       15 |        11
+3     | 2026-11-05 15:47:09 | RAT-002      | ENTRADA |     5 |       25 |        30
+4     | 2026-11-05 15:47:28 | TEC-001      | ENTRADA |     1 |       11 |        12
+-----------------------------------------------------------------------------------
+Total: 4 movimientos.
+Pulsa Intro para continuar...
+
+# --- PRUEBA 2: Filtrar por TEC-001 ---
+---------- HISTORIAL DE MOVIMIENTOS ----------
+1. Consultar todos los movimientos
+2. Consultar movimientos de un producto
+0. Volver al menú MySQL
+Selecciona una opción: 2
+
+---------- MOVIMIENTOS DE UN PRODUCTO ----------
+Código del producto: tec-001
+-----------------------------------------------------------------------------------
+ID    | FECHA/HORA          | PRODUCTO     | TIPO    | CANT. | ANTERIOR | POSTERIOR
+-----------------------------------------------------------------------------------
+1     | 2026-11-04 11:04:18 | TEC-001      | ENTRADA |     5 |       10 |        15
+2     | 2026-11-04 11:06:21 | TEC-001      | SALIDA  |     4 |       15 |        11
+4     | 2026-11-05 15:47:28 | TEC-001      | ENTRADA |     1 |       11 |        12
+-----------------------------------------------------------------------------------
+Total: 3 movimientos.
+Pulsa Intro para continuar...
+
+# ==========================================
+# Comprobación en la consola de MySQL
+# ==========================================
+mysql> SELECT COUNT(*) FROM movimiento_stock;
++----------+
+| COUNT(*) |
++----------+
+|        4 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM movimiento_stock ORDER BY fecha, id;
++----+-----------------+---------+----------+---------------------+----------------+-----------------+
+| id | producto_codigo | tipo    | cantidad | fecha               | stock_anterior | stock_posterior |
++----+-----------------+---------+----------+---------------------+----------------+-----------------+
+|  1 | TEC-001         | ENTRADA |        5 | 2026-11-04 11:04:18 |             10 |              15 |
+|  2 | TEC-001         | SALIDA  |        4 | 2026-11-04 11:06:21 |             15 |              11 |
+|  3 | RAT-002         | ENTRADA |        5 | 2026-11-05 15:47:09 |             25 |              30 |
+|  4 | TEC-001         | ENTRADA |        1 | 2026-11-05 15:47:28 |             11 |              12 |
++----+-----------------+---------+----------+---------------------+----------------+-----------------+
+4 rows in set (0.00 sec)    

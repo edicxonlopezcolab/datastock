@@ -1,0 +1,43 @@
+# CP-JDBC-06b · Validaciones en la consulta de historial
+# Fecha: 05-11-2026
+# Comando: mvn exec:java → opción 7 → opción 7 → opción 2
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
+# 
+# Estas pruebas demuestran que el menú valida antes de ir a la base de datos.
+
+# --- Prueba 4: Producto inexistente ---
+---------- HISTORIAL DE MOVIMIENTOS ----------
+1. Consultar todos los movimientos
+2. Consultar movimientos de un producto
+0. Volver al menú MySQL
+Selecciona una opción: 2
+
+---------- MOVIMIENTOS DE UN PRODUCTO ----------
+Código del producto: ZZZ-999
+[ERROR] no existe ningún producto con el código ZZZ-999
+Pulsa Intro para continuar...
+
+# --- Prueba 5: Código vacío ---
+---------- HISTORIAL DE MOVIMIENTOS ----------
+1. Consultar todos los movimientos
+2. Consultar movimientos de un producto
+0. Volver al menú MySQL
+Selecciona una opción: 2
+
+---------- MOVIMIENTOS DE UN PRODUCTO ----------
+Código del producto: 
+[ERROR] el código no puede estar vacío
+Pulsa Intro para continuar...
+
+# ==========================================
+# Comprobación en MySQL tras las pruebas
+# (El historial es de solo lectura)
+# ==========================================
+mysql> SELECT COUNT(*) FROM movimiento_stock;
++----------+
+| COUNT(*) |
++----------+
+|        4 |
++----------+
+1 row in set (0.00 sec)
