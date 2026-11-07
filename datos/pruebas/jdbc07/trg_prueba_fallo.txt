@@ -1,0 +1,12 @@
+DELIMITER //
+CREATE TRIGGER trg_prueba_fallo BEFORE INSERT ON producto
+FOR EACH ROW
+BEGIN
+  IF NEW.codigo = 'FALLO-03' THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Fallo forzado para la prueba CP-JDBC-18';
+  END IF;
+END//
+DELIMITER ;
+
+DROP TRIGGER trg_prueba_fallo;
+SHOW TRIGGERS;

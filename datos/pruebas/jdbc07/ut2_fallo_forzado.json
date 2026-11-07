@@ -1,0 +1,28 @@
+{
+    "productos": [
+        {
+            "codigo": "FALLO-01",
+            "nombre": "Producto válido 1",
+            "precio": 10.00,
+            "stock": 5,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "FALLO-02",
+            "nombre": "Producto válido 2",
+            "precio": 20.00,
+            "stock": 10,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "FALLO-03",
+            "nombre": "Producto que hará saltar el trigger",
+            "precio": 30.00,
+            "stock": 15,
+            "categoriaId": 1,
+            "proveedorId": 1
+        }
+    ]
+}
