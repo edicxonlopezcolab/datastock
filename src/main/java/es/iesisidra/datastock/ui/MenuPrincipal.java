@@ -11,6 +11,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
@@ -21,12 +22,14 @@ import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.ficheros.SerializadorInventario;
 import es.iesisidra.datastock.jdbc.CategoriaDAO;
 import es.iesisidra.datastock.jdbc.ComprobadorConexion;
+import es.iesisidra.datastock.jdbc.CopiaInventario;
 import es.iesisidra.datastock.jdbc.ErroresSQL;
 import es.iesisidra.datastock.jdbc.InfoConexion;
 import es.iesisidra.datastock.jdbc.MovimientoDAO;
 import es.iesisidra.datastock.jdbc.ProductoDAO;
 import es.iesisidra.datastock.jdbc.ProductoDetalle;
 import es.iesisidra.datastock.jdbc.ProveedorDAO;
+import es.iesisidra.datastock.jdbc.ResultadoValidacionProducto;
 import es.iesisidra.datastock.modelo.Categoria;
 import es.iesisidra.datastock.modelo.MovimientoStock;
 import es.iesisidra.datastock.modelo.Producto;
@@ -53,6 +56,7 @@ public class MenuPrincipal {
     private final ProductoDAO productoDAO = new ProductoDAO();
     private final ValidadorProducto validador = new ValidadorProducto();
     private final MovimientoDAO movimientoDAO = new MovimientoDAO();
+    private final CopiaInventario copiaInventario = new CopiaInventario();
 
 
     /** @param inventario colección común de productos de esta ejecución. */
@@ -173,7 +177,7 @@ public class MenuPrincipal {
                 case 5 -> menuConsultasMySQL();
                 case 6 -> menuMovimientos();
                 case 7 -> menuHistorial();
-                case 8 -> pendiente("RF-JDBC-07 · Importar de memoria");
+                case 8 -> importarMemoriaAMySQL();
                 case 9 -> pendiente("RF-JDBC-08 · Transacciones");
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
@@ -1207,6 +1211,91 @@ public class MenuPrincipal {
         
         System.out.println(separador);
         System.out.println("Total: " + lista.size() + " movimientos.");
+    }
+
+    private void importarMemoriaAMySQL()
+    {
+        System.out.println("\n---------- IMPORTAR PRODUCTOS DE MEMORIA A MYSQL ----------");
+        List<Producto> memoria = inventario.getProductos();
+        if (memoria.isEmpty())
+        {
+            System.out.println(ColoresConsola.pintar(
+                "[AVISO] no hay productos en memoria para importar.", ColoresConsola.AMARILLO));
+            LectorConsola.pausar();
+            return;
+        }
+        System.out.println("Productos disponibles en memoria: " + memoria.size());
+        if (!LectorConsola.confirmar("¿Deseas importarlos a MySQL?"))
+        {
+            System.out.println(ColoresConsola.pintar("Importación cancelada.", ColoresConsola.AMARILLO));
+            LectorConsola.pausar();
+            return;
+        }
+        List<Producto> aceptados = new ArrayList<>();
+        int omitidos = 0;
+        int rechazados = 0;
+        try
+        {
+            for (Producto p : memoria)
+            {
+                System.out.println("Comprobando " + p.getCodigo() + " - " + p.getNombre() + "...");
+                ResultadoValidacionProducto r = copiaInventario.validar(p);
+                switch (r.getEstado())
+                {
+                    case ACEPTADO -> {
+                        aceptados.add(p);
+                        System.out.println(ColoresConsola.pintar(
+                            "  [OK] válido para importar.", ColoresConsola.VERDE));
+                    }
+                    case DUPLICADO -> {
+                        omitidos++;
+                        System.out.println(ColoresConsola.pintar(
+                            "  [AVISO] " + r.getMotivo() + ". Se omite.", ColoresConsola.AMARILLO));
+                    }
+                    case RECHAZADO -> {
+                        rechazados++;
+                        System.out.println(ColoresConsola.pintar(
+                            "  [ERROR] " + r.getMotivo(), ColoresConsola.ROJO));
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar(
+                "[ERROR] fallo durante la validación: " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+            System.out.println("No se ha intentado insertar nada (importación abortada).");
+            LectorConsola.pausar();
+            return;
+        }
+        int insertados = 0;
+        boolean huboRollback = false;
+
+        if (!aceptados.isEmpty())
+        {
+            try
+            {
+                insertados = copiaInventario.insertarLote(aceptados);
+            }
+            catch (SQLException e)
+            {
+                huboRollback = true;
+                System.out.println(ColoresConsola.pintar(
+                    "[ERROR] fallo en la transacción: " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+                System.out.println(ColoresConsola.pintar(
+                    "No se ha confirmado ninguna inserción del lote (rollback aplicado).", ColoresConsola.ROJO));
+            }
+        }
+        System.out.println("\n---------- RESULTADO DE LA IMPORTACIÓN ----------");
+        System.out.println("Productos analizados:          " + memoria.size());
+        System.out.println("Productos insertados:          " + insertados);
+        System.out.println("Omitidos por código duplicado: " + omitidos);
+        System.out.println("Rechazados por otras causas:   " + rechazados);
+        if (!huboRollback)
+        {
+            System.out.println(ColoresConsola.pintar("[OK] Importación finalizada.", ColoresConsola.VERDE));
+        }
+        LectorConsola.pausar();
     }
 
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */

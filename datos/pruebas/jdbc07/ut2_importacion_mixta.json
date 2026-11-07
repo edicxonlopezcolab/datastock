@@ -1,0 +1,52 @@
+{
+    "productos": [
+        {
+            "codigo": "PRB-001",
+            "nombre": "Webcam HD",
+            "precio": 39.90,
+            "stock": 6,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "PRB-002",
+            "nombre": "Altavoces estéreo",
+            "precio": 24.50,
+            "stock": 9,
+            "categoriaId": 3,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "TEC-001",
+            "nombre": "Teclado mecánico",
+            "precio": 44.90,
+            "stock": 10,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "RAT-002",
+            "nombre": "Ratón inalámbrico",
+            "precio": 19.95,
+            "stock": 25,
+            "categoriaId": 1,
+            "proveedorId": 1
+        },
+        {
+            "codigo": "PRB-003",
+            "nombre": "Hub USB",
+            "precio": 15.00,
+            "stock": 4,
+            "categoriaId": 1,
+            "proveedorId": 9
+        },
+        {
+            "codigo": "PRB-004",
+            "nombre": "Cable HDMI",
+            "precio": 7.95,
+            "stock": 30,
+            "categoriaId": 9,
+            "proveedorId": 1
+        }
+    ]
+}

@@ -47,29 +47,49 @@ public class ProductoDAO
         return null;
     }
 
-    /**
+        /**
      * Inserta un producto en la base de datos.
+     * Abre su propia conexión, la usa y la cierra al terminar.
+     * Delega el INSERT en la sobrecarga que recibe la conexión.
      * @param p Producto ya validado.
-     * @throws SQLException Si ocurre un error SQL (clave duplicada, FK inexistente, etc.).
+     * @throws SQLException Si ocurre un error SQL.
      */
-    public void insertar(Producto p) throws SQLException 
+    public void insertar(Producto p) throws SQLException
     {
-        String sql = "INSERT INTO producto (codigo, nombre, precio, stock, categoria_id, proveedor_id) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection con = ConexionBD.abrir())
+        {
+            insertar(con, p);
+        }
+    }
 
-        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql)) 
+    /**
+     * Inserta un producto usando una conexión ya abierta.
+     * NO cierra la conexión (la cierra quien la abrió).
+     * Esto permite usarla dentro de una transacción en lote.
+     * @param con Conexión abierta por el llamador.
+     * @param p Producto ya validado.
+     * @throws SQLException Si ocurre un error SQL.
+     */
+    public void insertar(Connection con, Producto p) throws SQLException
+    {
+        String sql = "INSERT INTO producto "
+                   + "(codigo, nombre, precio, stock, categoria_id, proveedor_id) "
+                   + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement ps = con.prepareStatement(sql))
         {
             ps.setString(1, p.getCodigo());
             ps.setString(2, p.getNombre());
-            ps.setBigDecimal(3, p.getPrecio());
+            ps.setBigDecimal(3, p.getPrecio());   // BigDecimal ↔ DECIMAL(10,2)
             ps.setInt(4, p.getStock());
             ps.setInt(5, p.getCategoriaId());
             ps.setInt(6, p.getProveedorId());
-            
+
             ps.executeUpdate();
         }
     }
 
-        /**
+    /**
      * Modifica nombre, precio, categoría y proveedor de un producto.
      * El código y el stock no se modifican: el stock solo cambia con movimientos.
      * @param p producto con el código existente y los datos nuevos
