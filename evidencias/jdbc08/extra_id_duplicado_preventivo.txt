@@ -1,0 +1,16 @@
+# CP-JDBC-21 · Comprobación preventiva de IDs duplicados
+# Fecha: 07-11-2026
+# Comando: mvn exec:java → opción 7 → opción 9 (tercera ejecución sin limpiar)
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
+
+---------- GESTIÓN MYSQL - UT2 ----------
+Selecciona una opción: 9
+
+---------- DEMOSTRACIÓN DE TRANSACCIÓN ----------
+IDs a usar: 901, 902, 903
+Nombres: DEMO-TX-901, DEMO-TX-902, DEMO-TX-903
+[AVISO] Los IDs [901, 902] ya existen en MySQL: no se ejecuta la demo.
+Para limpiar los datos de prueba, ejecuta en MySQL:
+  DELETE FROM categoria WHERE id IN (901, 902, 903) AND nombre LIKE 'DEMO-TX-%';
+Pulsa Intro para continuar...

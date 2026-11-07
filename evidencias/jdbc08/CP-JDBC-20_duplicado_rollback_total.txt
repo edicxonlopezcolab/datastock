@@ -1,0 +1,21 @@
+# CP-JDBC-20 · Demostración de rollback (Escenario B) - Rollback total
+# Fecha: 07-11-2026
+# Comando: mvn exec:java → opción 7 → opción 9
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
+
+=== Escenario B: ROLLBACK (con duplicado forzado) ===
+[OK] ROLLBACK correcto: el duplicado lanzó error 1062 como se esperaba.
+[OK] El ID 903 no quedó: el rollback deshizo la primera inserción.
+
+mysql> SELECT id, nombre FROM categoria WHERE id = 903;
+Empty set (0.00 sec)
+
+mysql> SELECT id, nombre FROM categoria WHERE id IN (901, 902);
++-----+-------------+
+| id  | nombre      |
++-----+-------------+
+| 901 | DEMO-TX-901 |
+| 902 | DEMO-TX-902 |
++-----+-------------+
+2 rows in set (0.00 sec)

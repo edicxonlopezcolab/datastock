@@ -60,18 +60,32 @@ public class CategoriaDAO
     }
 
     /**
-     * Da de alta una categoría.
-     * @param c categoría con id y nombre
-     * @throws SQLException si el id o el nombre ya existen, o si falla la conexión
+     * Inserta una categoría usando una conexión ya abierta.
+     * NO cierra la conexión (la cierra quien la abrió).
+     * @param con Conexión abierta por el llamador.
+     * @param c Categoría a insertar.
+     * @throws SQLException Si ocurre un error SQL.
      */
-    public void insertar(Categoria c) throws SQLException
+    public void insertar(Connection con, Categoria c) throws SQLException
     {
-        String sql = "INSERT INTO categoria (id, nombre) VALUES(?, ?)";
-        try (Connection con = ConexionBD.abrir();PreparedStatement ps = con.prepareStatement(sql)) 
+        String sql = "INSERT INTO categoria (id, nombre) VALUES (?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql))
         {
             ps.setInt(1, c.getId());
             ps.setString(2, c.getNombre());
             ps.executeUpdate();
+        }
+    }
+
+    /**
+     * Inserta una categoría abriendo su propia conexión.
+     * Delega en la sobrecarga que recibe la conexión.
+     */
+    public void insertar(Categoria c) throws SQLException
+    {
+        try (Connection con = ConexionBD.abrir())
+        {
+            insertar(con, c);
         }
     }
 

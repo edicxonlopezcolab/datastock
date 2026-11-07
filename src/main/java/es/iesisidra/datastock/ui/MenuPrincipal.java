@@ -23,6 +23,7 @@ import es.iesisidra.datastock.ficheros.SerializadorInventario;
 import es.iesisidra.datastock.jdbc.CategoriaDAO;
 import es.iesisidra.datastock.jdbc.ComprobadorConexion;
 import es.iesisidra.datastock.jdbc.CopiaInventario;
+import es.iesisidra.datastock.jdbc.DemoTransacciones;
 import es.iesisidra.datastock.jdbc.ErroresSQL;
 import es.iesisidra.datastock.jdbc.InfoConexion;
 import es.iesisidra.datastock.jdbc.MovimientoDAO;
@@ -57,6 +58,7 @@ public class MenuPrincipal {
     private final ValidadorProducto validador = new ValidadorProducto();
     private final MovimientoDAO movimientoDAO = new MovimientoDAO();
     private final CopiaInventario copiaInventario = new CopiaInventario();
+    private final DemoTransacciones demoTransacciones = new DemoTransacciones();
 
 
     /** @param inventario colección común de productos de esta ejecución. */
@@ -178,7 +180,7 @@ public class MenuPrincipal {
                 case 6 -> menuMovimientos();
                 case 7 -> menuHistorial();
                 case 8 -> importarMemoriaAMySQL();
-                case 9 -> pendiente("RF-JDBC-08 · Transacciones");
+                case 9 -> demostracionTransaccion();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -1298,6 +1300,103 @@ public class MenuPrincipal {
         LectorConsola.pausar();
     }
 
+    private void demostracionTransaccion()
+    {
+        System.out.println("\n---------- DEMOSTRACIÓN DE TRANSACCIÓN ----------");
+        System.out.println("IDs a usar: " + DemoTransacciones.ID_A1 + ", "
+                + DemoTransacciones.ID_A2 + ", " + DemoTransacciones.ID_B1);
+        System.out.println("Nombres: " + DemoTransacciones.NOMBRE_A1 + ", "
+                + DemoTransacciones.NOMBRE_A2 + ", " + DemoTransacciones.NOMBRE_B1);
+        // 1. Comprobación preventiva ANTES del S/N
+        try
+        {
+            List<Integer> ocupados = demoTransacciones.idsOcupados();
+            if (!ocupados.isEmpty())
+            {
+                System.out.println(ColoresConsola.pintar(
+                    "[AVISO] Los IDs " + ocupados + " ya existen en MySQL: no se ejecuta la demo.",
+                    ColoresConsola.AMARILLO));
+                System.out.println("Para limpiar los datos de prueba, ejecuta en MySQL:");
+                System.out.println("  DELETE FROM categoria WHERE id IN ("
+                        + DemoTransacciones.ID_A1 + ", " + DemoTransacciones.ID_A2 + ", "
+                        + DemoTransacciones.ID_B1 + ") AND nombre LIKE 'DEMO-TX-%';");
+                LectorConsola.pausar();
+                return;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar(
+                "[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+            LectorConsola.pausar();
+            return;
+        }
+        // 2. Confirmación S/N (solo se llega aquí si los IDs están libres)
+        if (!LectorConsola.confirmar("¿Ejecutar la demo (escenario A + escenario B)?"))
+        {
+            System.out.println(ColoresConsola.pintar("Demo cancelada.", ColoresConsola.AMARILLO));
+            LectorConsola.pausar();
+            return;
+        }
+        try
+        {
+            // Escenario A: commit
+            System.out.println("\n=== Escenario A: COMMIT ===");
+            demoTransacciones.ejecutarEscenarioA();
+            boolean ok901 = categoriaDAO.buscarPorId(DemoTransacciones.ID_A1) != null;
+            boolean ok902 = categoriaDAO.buscarPorId(DemoTransacciones.ID_A2) != null;
+            if (ok901 && ok902)
+            {
+                System.out.println(ColoresConsola.pintar(
+                    "[OK] COMMIT correcto: las categorías 901 y 902 persisten en MySQL.",
+                    ColoresConsola.VERDE));
+            }
+            // Escenario B: rollback
+            System.out.println("\n=== Escenario B: ROLLBACK (con duplicado forzado) ===");
+            try
+            {
+                demoTransacciones.ejecutarEscenarioB();
+                System.out.println(ColoresConsola.pintar(
+                    "[ERROR] El escenario B no lanzó el error esperado.", ColoresConsola.ROJO));
+            }
+            catch (SQLException e)
+            {
+                if (e.getErrorCode() == 1062)
+                {
+                    System.out.println(ColoresConsola.pintar(
+                        "[OK] ROLLBACK correcto: el duplicado lanzó error 1062 como se esperaba.",
+                        ColoresConsola.VERDE));
+                }
+                else
+                {
+                    System.out.println(ColoresConsola.pintar(
+                        "[ERROR] Error inesperado: " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+                }
+            }
+            boolean quedo903 = categoriaDAO.buscarPorId(DemoTransacciones.ID_B1) != null;
+            if (!quedo903)
+            {
+                System.out.println(ColoresConsola.pintar(
+                    "[OK] El ID " + DemoTransacciones.ID_B1
+                    + " no quedó: el rollback deshizo la primera inserción.",
+                    ColoresConsola.VERDE));
+            }
+            // Cierre
+            System.out.println("\n---------- FIN DE LA DEMOSTRACIÓN ----------");
+            System.out.println("IDs usados: " + DemoTransacciones.ID_A1 + ", "
+                    + DemoTransacciones.ID_A2 + ", " + DemoTransacciones.ID_B1);
+            System.out.println("Para limpiar los datos de prueba, ejecuta en MySQL:");
+            System.out.println("  DELETE FROM categoria WHERE id IN ("
+                    + DemoTransacciones.ID_A1 + ", " + DemoTransacciones.ID_A2 + ", "
+                    + DemoTransacciones.ID_B1 + ") AND nombre LIKE 'DEMO-TX-%';");
+        }
+        catch (SQLException e)
+        {
+            System.out.println(ColoresConsola.pintar(
+                "[ERROR] " + ErroresSQL.explicar(e), ColoresConsola.ROJO));
+        }
+        LectorConsola.pausar();
+    }
     /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */
     private void pendiente(String requisito) {
         System.out.println(ColoresConsola.pintar("[PENDIENTE] " + requisito, ColoresConsola.AMARILLO));
