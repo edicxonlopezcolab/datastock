@@ -1,0 +1,24 @@
+# CP-SQLITE-01 · Primera ejecución: creación del fichero y dos filas recuperadas
+# Fecha: 07-11-2026
+# Comando: mvn exec:java "-Dexec.mainClass=es.iesisidra.datastock.complementarias.DemoSQLite"
+# Entorno: Windows PowerShell, JDK 21
+# Dependencia: org.xerial:sqlite-jdbc:3.45.1.0
+
+PS C:\...> Get-Item datos\sqlite\productos_demo.db
+Get-Item : No se encuentra la ruta de acceso 'C:\...\datos\sqlite\productos_demo.db' porque no existe.
+
+PS C:\...> mvn exec:java "-Dexec.mainClass=es.iesisidra.datastock.complementarias.DemoSQLite"
+[INFO] Scanning for projects...
+[INFO] --- exec:3.5.0:java (default-cli) @ datastock ---
+
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+[OK] Conexión SQLite abierta: datos/sqlite/productos_demo.db
+[OK] Tabla producto_demo disponible.
+Insertados: 2 | Ya existentes: 0
+SQL-001 | Producto demo A
+SQL-002 | Producto demo B
+[OK] El fichero SQLite persiste en disco: C:\...\datos\sqlite\productos_demo.db
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS

@@ -11,3 +11,4 @@ datos/salidas/*
 *.tmp
 .~lock.*
 src/main/resources/db.properties
+datos/sqlite/*.db
