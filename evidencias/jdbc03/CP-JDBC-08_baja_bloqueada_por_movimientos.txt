@@ -2,7 +2,7 @@
 # Fecha: 04-11-2026
 # Comando: mvn exec:java → opción 7 → opción 4 → opción 4
 # Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
-# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
 # Estado de partida: TEC-001 con stock 11 y 2 movimientos en movimiento_stock.
 
 ---------- PRODUCTOS ----------

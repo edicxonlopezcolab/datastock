@@ -66,3 +66,9 @@ mysql> SELECT COUNT(*) FROM producto;
 
 mysql> SELECT codigo FROM producto WHERE codigo LIKE 'FALLO-%';
 Empty set (0.00 sec)
+
+mysql> DROP TRIGGER trg_prueba_fallo;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SHOW TRIGGERS;
+Empty set (0.00 sec)

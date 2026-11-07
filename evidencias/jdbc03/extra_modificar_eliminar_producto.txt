@@ -1,8 +1,8 @@
-# CP-JDBC-03c · Validaciones al modificar y eliminar productos
+# EX-JDBC-08 · Validaciones al modificar y eliminar productos
 # Fecha: 03-11-2026
 # Comando: mvn exec:java → opción 7 → opción 4 → opción 3 (modificar) / opción 4 (eliminar)
 # Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
-# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
 
 ---------- PRODUCTOS ----------
 1. Dar de alta un producto

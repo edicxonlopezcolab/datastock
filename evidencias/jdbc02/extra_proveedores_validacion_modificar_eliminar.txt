@@ -1,8 +1,8 @@
-# CP-JDBC-02g · Proveedores: validación de email, modificación y eliminación
+# EX-JDBC-06 · Proveedores: validación de email, modificación y eliminación
 # Fecha: 03-11-2026
 # Comando: mvn exec:java → opción 7 → opción 3
 # Entorno: Linux (D22-12), MySQL 8.0.46, JDK 21
-# Archivo de configuración: config/datastock.properties (local, excluido de Git)
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
 
 ---------- PROVEEDORES ----------
 1. Dar de alta un proveedor

@@ -1,4 +1,4 @@
-# CP-JDBC-07b · Casos auxiliares de importación de memoria a MySQL
+# EX-JDBC-12 · Casos auxiliares de importación de memoria a MySQL
 # Fecha: 07-11-2026
 # Comando: mvn exec:java → opción 7 → opción 8
 # Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21

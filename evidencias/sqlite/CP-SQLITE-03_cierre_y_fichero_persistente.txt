@@ -10,3 +10,29 @@ PS C:\...> Get-Item datos\sqlite\productos_demo.db
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
 -a----       7/11/2026  5:59 p. m.          12288 productos_demo.db
+
+# 1. Connection
+try (Connection con = DriverManager.getConnection(URL))
+{
+    # 2. Statement (para crear la tabla)
+    try (Statement st = con.createStatement())
+    {
+        st.executeUpdate(sqlCrear);
+    }
+    
+    # 3. PreparedStatement (para insertar)
+    try (PreparedStatement ps = con.prepareStatement(sqlInsert))
+    {
+        // ...
+    }
+    
+    # 4. PreparedStatement + ResultSet (para consultar)
+    try (PreparedStatement ps = con.prepareStatement(sqlSelect);
+         ResultSet rs = ps.executeQuery())
+    {
+        while (rs.next())
+        {
+            // ...
+        }
+    }
+} 

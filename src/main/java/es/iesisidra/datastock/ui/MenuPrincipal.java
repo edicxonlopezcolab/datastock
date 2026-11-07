@@ -1001,9 +1001,9 @@ public class MenuPrincipal {
     {
         System.out.println("\n---------- STOCK BAJO ----------");
         int umbral = LectorConsola.leerEntero("Mostrar productos con stock menor que: ");
-        if (umbral < 1)
+        if (umbral < 0)
         {
-            error("el umbral debe ser un entero positivo");
+            error("el umbral debe ser un entero mayor o igual que cero");
             return;
         }
         try
