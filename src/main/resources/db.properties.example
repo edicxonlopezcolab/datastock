@@ -1,4 +1,5 @@
-# Copia este fichero como datastock.properties y pon tus credenciales.
+# Copia este fichero como db.properties (en la misma carpeta) y pon tus credenciales.
+# db.properties está en .gitignore: no se sube al repositorio.
 jdbc.url=jdbc:mysql://localhost:3306/datastock?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Madrid
 jdbc.user=datastock
 jdbc.password=CAMBIAR
