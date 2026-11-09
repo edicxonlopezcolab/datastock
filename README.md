@@ -38,7 +38,7 @@ Esta versión corresponde a la entrega de la UT2 (etiqueta `UT2-v1.0`). La UT1 s
 
 - JDK **21** instalado y seleccionado en el IDE (`java -version`).
 - Maven instalado, o un IDE con integración Maven.
-- **MySQL 8.0.16 o posterior** (probado con 8.0.46) y, opcionalmente, MySQL Workbench.
+- **MySQL 8.0.16 o posterior** (probado con 8.0.46) y su cliente de consola `mysql`. MySQL Workbench es opcional.
 - Conexión a Internet la primera vez, para que Maven descargue las dependencias:
 
 | Dependencia | Versión | Uso |
@@ -55,11 +55,13 @@ El esquema se crea con el script `material_referencia/DataStock_BD_MySQL.sql`, q
 crea la base `datastock`, las tablas `categoria`, `proveedor`, `producto` y `movimiento_stock` con todas sus
 restricciones, y el procedimiento `registrar_movimiento`. Es idempotente: puede ejecutarse varias veces sin borrar datos.
 
-1. Ejecuta el script con MySQL Workbench (*File → Open SQL Script* y ejecutar) o desde el cliente `mysql`:
+1. Abre el cliente de consola desde la carpeta del proyecto (`mysql -u root -p`) y ejecuta el script:
 
    ```sql
    SOURCE material_referencia/DataStock_BD_MySQL.sql;
    ```
+
+   Opcionalmente puedes ejecutarlo con MySQL Workbench (*File → Open SQL Script* y ejecutar).
 
 2. Comprueba que existe todo lo necesario:
 
