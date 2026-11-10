@@ -1,0 +1,13 @@
+{
+    "productos": [
+        {},
+        {
+            "codigo": "MON-011",
+            "nombre": "Monitor 27 pulgadas",
+            "precio": 219.90,
+            "stock": 5,
+            "categoriaId": 2,
+            "proveedorId": 2
+        }
+    ]
+}
