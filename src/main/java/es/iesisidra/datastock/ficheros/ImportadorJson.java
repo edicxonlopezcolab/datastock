@@ -108,6 +108,11 @@ public class ImportadorJson {
                 else
                 {
                     JsonObject producto = elemento.getAsJsonObject();
+                    if (producto.size() == 0)
+                    {
+                        resultado.agregarIncidencia("Producto " + posicion + ": producto vacío, no tiene ningún campo");
+                        continue;
+                    }
                     String codigo = leerCampo(producto, "codigo");
                     String nombre = leerCampo(producto, "nombre");
                     String precio = leerCampo(producto, "precio");
