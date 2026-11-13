@@ -3,10 +3,7 @@ package es.iesisidra.datastock.ficheros;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,60 +14,51 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonArray;
 
-import es.iesisidra.datastock.modelo.Producto;
-import es.iesisidra.datastock.servicio.Inventario;
-import es.iesisidra.datastock.servicio.ResultadoImportacion;
 import es.iesisidra.datastock.validacion.ValidadorProducto;
 
 /**
- * Importa productos desde un catálogo JSON (RF-FIC-02).
- * <p>No imprime nada por consola: devuelve un {@link ResultadoImportacion}
- * que el menú se encarga de mostrar.</p>
+ * Componente que lee y valida un catálogo JSON de productos (RF-FIC-02).
+ * <p>No modifica el inventario ni escribe en consola: devuelve un
+ * {@link ResultadoLectura} con los productos válidos y las incidencias
+ * detectadas para que el menú decida qué hacer con ellos.</p>
  */
 public class LectorProductosJson {
 
     /**
-     * Lee el fichero, valida cada producto y añade los válidos al inventario.
-     * Si el documento no puede interpretarse, no se modifica el inventario.
-     * @param textoRuta ruta del fichero JSON escrita por el usuario
-     * @param inventario inventario común donde se añaden los productos
-     * @return resumen con encontrados, importados, rechazados e incidencias,
-     *         o un error general si el documento no es válido
+     * Lee el fichero indicado, valida cada producto y acumula en el
+     * resultado los válidos y las incidencias encontradas.
+     * <p>No modifica el inventario ni imprime nada por consola.</p>
+     * <p>No lanza excepciones: los fallos previstos (ruta nula, fichero
+     * inexistente o ilegible, JSON mal formado, error de E/S, etc.)
+     * se devuelven en el error general del resultado.</p>
+     *
+     * @param ruta ruta del fichero JSON a leer
+     * @return resultado con los productos válidos leídos, las incidencias
+     *         por cada producto rechazado, o un error general si el
+     *         documento no puede interpretarse
      */
-    public ResultadoImportacion importar(String textoRuta, Inventario inventario) 
+    public ResultadoLectura leer(Path ruta)
     {
-
-        ResultadoImportacion resultado = new ResultadoImportacion();
+        ResultadoLectura resultado = new ResultadoLectura();
         ValidadorProducto validador = new ValidadorProducto();
 
-        if (textoRuta == null || textoRuta.trim().isEmpty()) 
+        if (ruta == null)
         {
-            resultado.setErrorGeneral("la ruta está vacía");
+            resultado.setErrorGeneral("la ruta es nula");
             return resultado;
         }
 
-        Path ruta;
-        try 
-        {
-            ruta = Paths.get(textoRuta.trim());
-        } 
-        catch (InvalidPathException e) 
-        {
-            resultado.setErrorGeneral("la ruta no es válida");
-            return resultado;
-        }
-
-        if (!Files.exists(ruta)) 
+        if (!Files.exists(ruta))
         {
             resultado.setErrorGeneral("el fichero no existe");
             return resultado;
-        } 
-        else if (!Files.isRegularFile(ruta)) 
+        }
+        else if (!Files.isRegularFile(ruta))
         {
             resultado.setErrorGeneral("la ruta no corresponde a un fichero regular");
             return resultado;
-        } 
-        else if (!Files.isReadable(ruta)) 
+        }
+        else if (!Files.isReadable(ruta))
         {
             resultado.setErrorGeneral("el fichero no se puede leer");
             return resultado;
@@ -79,14 +67,14 @@ public class LectorProductosJson {
         try (Reader lector = Files.newBufferedReader(ruta, StandardCharsets.UTF_8))
         {
             JsonElement raiz = JsonParser.parseReader(lector);
-            if (!raiz.isJsonObject()) 
+            if (!raiz.isJsonObject())
             {
                 resultado.setErrorGeneral("la raíz debe ser un objeto JSON");
                 return resultado;
             }
             JsonObject objeto = raiz.getAsJsonObject();
 
-            if (!objeto.has("productos") || !objeto.get("productos").isJsonArray()) 
+            if (!objeto.has("productos") || !objeto.get("productos").isJsonArray())
             {
                 resultado.setErrorGeneral("falta el array productos");
                 return resultado;
@@ -94,14 +82,13 @@ public class LectorProductosJson {
             JsonArray array = objeto.get("productos").getAsJsonArray();
 
             int posicion = 0;
-            List<Producto> validos = new ArrayList<>();
             Set<String> codigosVistos = new HashSet<>();
-            for (JsonElement elemento : array) 
+            for (JsonElement elemento : array)
             {
                 posicion++;
                 resultado.sumarEncontrado();
 
-                if (!elemento.isJsonObject()) 
+                if (!elemento.isJsonObject())
                 {
                     resultado.agregarIncidencia("Producto " + posicion + ": no es un objeto JSON");
                 }
@@ -122,41 +109,30 @@ public class LectorProductosJson {
                     List<String> errores = validador.validar(codigo, nombre, precio, stock, categoriaId, proveedorId);
 
                     String codigoMostrar;
-                    if (codigo != null && !codigo.trim().isEmpty()) 
+                    if (codigo != null && !codigo.trim().isEmpty())
                     {
                         codigoMostrar = codigo;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         codigoMostrar = "sin código";
-                    }                                
-                    if (!errores.isEmpty()) 
+                    }
+                    if (!errores.isEmpty())
                     {
                         resultado.agregarIncidencia("Producto " + posicion + " (" + codigoMostrar + "): " + String.join("; ", errores));
                     }
                     else
                     {
                         String codigoNormalizado = ValidadorProducto.normalizarCodigo(codigo);
-                        if (!codigosVistos.add(codigoNormalizado)) 
+                        if (!codigosVistos.add(codigoNormalizado))
                         {
                             resultado.agregarIncidencia("Producto " + posicion + " (" + codigoMostrar + "): código repetido en el fichero");
-                        } 
-                        else 
+                        }
+                        else
                         {
-                            validos.add(validador.crear(codigo, nombre, precio, stock, categoriaId, proveedorId));
+                            resultado.agregarProducto(validador.crear(codigo, nombre, precio, stock, categoriaId, proveedorId));
                         }
                     }
-                }
-            }
-            for(Producto producto : validos)
-            {
-                if (inventario.agregar(producto)) 
-                {
-                    resultado.sumarImportado();
-                } 
-                else 
-                {
-                    resultado.agregarIncidencia(producto.getCodigo() + ": ya existe en el inventario");
                 }
             }
         }
@@ -168,7 +144,7 @@ public class LectorProductosJson {
         {
             resultado.setErrorGeneral("se ha producido un error de lectura en el fichero");
         }
-        
+
         return resultado;
     }
 
@@ -176,14 +152,14 @@ public class LectorProductosJson {
      * Lee un campo de un producto JSON como texto.
      * @return el valor como texto, o null si falta, es null o no es un valor simple
      */
-    private String leerCampo(JsonObject producto, String nombre) 
+    private String leerCampo(JsonObject producto, String nombre)
     {
         JsonElement valor = producto.get(nombre);
-        if (valor == null || valor.isJsonNull()) 
+        if (valor == null || valor.isJsonNull())
         {
             return null;
         }
-        if (valor.isJsonPrimitive()) 
+        if (valor.isJsonPrimitive())
         {
             return valor.getAsString();
         }

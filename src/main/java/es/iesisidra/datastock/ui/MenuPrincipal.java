@@ -36,6 +36,7 @@ import es.iesisidra.datastock.modelo.MovimientoStock;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.modelo.Proveedor;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
+import es.iesisidra.datastock.ficheros.ResultadoLectura;
 
 /**
  * Presentación de menús y navegación de la primera fase de DataStock.
@@ -1416,9 +1417,60 @@ public class MenuPrincipal {
     {
         System.out.println("\n---------- IMPORTAR JSON ----------");
         String texto = LectorConsola.leerTexto("Digite la Ruta: ");
-        ResultadoImportacion resultado = lectorJson.importar(texto, inventario);
+
+        if (texto == null || texto.trim().isEmpty())
+        {
+            error("la ruta está vacía");
+            return;
+        }
+        Path ruta;
+        try
+        {
+            ruta = Paths.get(texto.trim());
+        }
+        catch (InvalidPathException e)
+        {
+            error("la ruta no es válida");
+            return;
+        }
+        ResultadoLectura lectura = lectorJson.leer(ruta);
+        if (lectura.hayErrorGeneral())
+        {
+            error(lectura.getErrorGeneral());
+            return;
+        }
+
+        ResultadoImportacion resultado = incorporarAlInventario(lectura);
         mostrarResultado(resultado);
         LectorConsola.pausar();
+    }
+
+    private ResultadoImportacion incorporarAlInventario(ResultadoLectura lectura)
+    {
+        ResultadoImportacion resultado = new ResultadoImportacion();
+         // Encontrados: sumarEncontrado() suma de uno en uno; se repite
+        // getEncontrados() veces para no añadir métodos a ResultadoImportacion
+        // (que comparte con el importador XML).
+        for (int i = 0; i < lectura.getEncontrados(); i++)
+        {
+            resultado.sumarEncontrado();
+        }
+        for (String incidencia : lectura.getIncidencias())
+        {
+            resultado.agregarIncidencia(incidencia);
+        }
+        for (Producto producto : lectura.getProductos())
+        {
+            if (inventario.agregar(producto))
+            {
+                resultado.sumarImportado();
+            }
+            else
+            {
+                resultado.agregarIncidencia(producto.getCodigo() + ": ya existe en el inventario");
+            }
+        }
+        return resultado;
     }
 
     private void importarXml()
