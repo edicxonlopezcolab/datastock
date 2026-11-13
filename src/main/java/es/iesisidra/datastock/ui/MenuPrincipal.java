@@ -17,7 +17,7 @@ import java.util.List;
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
 import es.iesisidra.datastock.ficheros.ExportadorJson;
 import es.iesisidra.datastock.ficheros.ExportadorXml;
-import es.iesisidra.datastock.ficheros.ImportadorJson;
+import es.iesisidra.datastock.ficheros.LectorProductosJson;
 import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.ficheros.SerializadorInventario;
 import es.iesisidra.datastock.jdbc.CategoriaDAO;
@@ -46,7 +46,7 @@ import es.iesisidra.datastock.servicio.ResultadoImportacion;
 public class MenuPrincipal {
     private final Inventario inventario;
     private final ExploradorRutas explorador = new ExploradorRutas();
-    private final ImportadorJson importadorJson = new ImportadorJson();
+    private final LectorProductosJson lectorJson = new LectorProductosJson();
     private final ImportadorXml importadorXml = new ImportadorXml();
     private final ExportadorJson exportadorJson = new ExportadorJson();
     private final ExportadorXml exportadorXml = new ExportadorXml();
@@ -1416,7 +1416,7 @@ public class MenuPrincipal {
     {
         System.out.println("\n---------- IMPORTAR JSON ----------");
         String texto = LectorConsola.leerTexto("Digite la Ruta: ");
-        ResultadoImportacion resultado = importadorJson.importar(texto, inventario);
+        ResultadoImportacion resultado = lectorJson.importar(texto, inventario);
         mostrarResultado(resultado);
         LectorConsola.pausar();
     }

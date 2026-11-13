@@ -27,7 +27,7 @@ import es.iesisidra.datastock.validacion.ValidadorProducto;
  * <p>No imprime nada por consola: devuelve un {@link ResultadoImportacion}
  * que el menú se encarga de mostrar.</p>
  */
-public class ImportadorJson {
+public class LectorProductosJson {
 
     /**
      * Lee el fichero, valida cada producto y añade los válidos al inventario.

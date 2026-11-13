@@ -1,0 +1,88 @@
+# Captura del estado ANTES de la refactorización (UT3)
+# Fecha: 13-11-2026
+# Comando: mvn exec:java → opción 2 (Importar JSON)
+# Entorno: Windows PowerShell, JDK 21
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
+# 
+# Objetivo: registrar el comportamiento exacto del ImportadorJson original
+# para compararlo después de refactorizarlo a LectorProductosJson.
+
+# Estado inicial: Inventario vacío (0 productos en memoria)
+
+# --- CASO 1: Importar JSON válido (primera vez) ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/tres_validos.json
+Encontrados: 3
+Importados: 3
+Rechazados: 0
+[OK] Importación finalizada.
+Pulsa Intro para continuar...
+
+# --- CASO 2: Importar el mismo JSON válido (duplicados contra inventario) ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/tres_validos.json
+Encontrados: 3
+Importados: 0
+Rechazados: 3
+Detalle de incidencias:
+  - MON-010: ya existe en el inventario
+  - ALT-011: ya existe en el inventario
+  - WEB-012: ya existe en el inventario
+[OK] Importación finalizada.
+Pulsa Intro para continuar...
+
+# --- CASO 3: JSON con errores (precio negativo y duplicado en el mismo fichero) ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/ejemplos/catalogo_con_errores.json
+Encontrados: 3
+Importados: 1
+Rechazados: 2
+Detalle de incidencias:
+  - Producto 1 (TEC-004): el precio debe ser mayor que 0
+  - Producto 3 (CAB-005): código repetido en el fichero
+[OK] Importación finalizada.
+Pulsa Intro para continuar...
+
+# --- CASO 4: JSON mal formado ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/ejemplos/catalogo_malformado.json
+[ERROR] el fichero contiene un JSON mal formado
+Pulsa Intro para continuar...
+
+# --- CASO 5: JSON con un producto vacío (null) ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/nuloprueba.json
+Encontrados: 2
+Importados: 1
+Rechazados: 1
+Detalle de incidencias:
+  - Producto 1: producto vacío, no tiene ningún campo
+[OK] Importación finalizada.
+Pulsa Intro para continuar...
+
+# --- CASO 6: JSON sin el array "productos" ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/sin_array.json
+[ERROR] falta el array productos
+Pulsa Intro para continuar...
+
+# --- CASO 7: Ruta vacía ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: 
+[ERROR] la ruta está vacía
+Pulsa Intro para continuar...
+
+# --- CASO 8: Fichero inexistente ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/no_existe.json
+[ERROR] el fichero no existe
+Pulsa Intro para continuar...
+
+# ==========================================
+# CONCLUSIÓN
+# ==========================================
+# El comportamiento actual del ImportadorJson es el esperado por la UT1.
+# Se han cubierto 8 casos: válidos, duplicados en memoria, errores de validación,
+# errores estructurales de JSON, productos nulos, falta de array, ruta vacía y
+# fichero inexistente. Todos los mensajes de error y flujos se consideran el
+# "estado base" que debe mantenerse intacto tras la refactorización a UT3.
