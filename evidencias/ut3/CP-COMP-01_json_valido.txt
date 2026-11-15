@@ -65,5 +65,4 @@ Pulsa Intro para continuar...
 # CONCLUSIÓN
 # ==========================================
 # El componente LectorProductosJson ha leído el fichero y ha devuelto los 3
-# productos. El menú los ha añadido al inventario, normalizando el código 
-# web-012 a WEB-012. La integración (RA6-i) es correcta.
+# productos. El menú los ha añadido al inventario.
