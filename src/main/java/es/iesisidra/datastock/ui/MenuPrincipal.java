@@ -13,11 +13,12 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
 import es.iesisidra.datastock.ficheros.ExportadorJson;
 import es.iesisidra.datastock.ficheros.ExportadorXml;
-import es.iesisidra.datastock.ficheros.ImportadorJson;
+import es.iesisidra.datastock.ficheros.LectorProductosJson;
 import es.iesisidra.datastock.ficheros.ImportadorXml;
 import es.iesisidra.datastock.ficheros.SerializadorInventario;
 import es.iesisidra.datastock.jdbc.CategoriaDAO;
@@ -36,6 +37,8 @@ import es.iesisidra.datastock.modelo.MovimientoStock;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.modelo.Proveedor;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
+import es.iesisidra.datastock.ficheros.ResultadoLectura;
+import es.iesisidra.datastock.jdbc.ConsultaProductoJdbc;
 
 /**
  * Presentación de menús y navegación de la primera fase de DataStock.
@@ -46,7 +49,7 @@ import es.iesisidra.datastock.servicio.ResultadoImportacion;
 public class MenuPrincipal {
     private final Inventario inventario;
     private final ExploradorRutas explorador = new ExploradorRutas();
-    private final ImportadorJson importadorJson = new ImportadorJson();
+    private final LectorProductosJson lectorJson = new LectorProductosJson();
     private final ImportadorXml importadorXml = new ImportadorXml();
     private final ExportadorJson exportadorJson = new ExportadorJson();
     private final ExportadorXml exportadorXml = new ExportadorXml();
@@ -59,6 +62,7 @@ public class MenuPrincipal {
     private final MovimientoDAO movimientoDAO = new MovimientoDAO();
     private final CopiaInventario copiaInventario = new CopiaInventario();
     private final DemoTransacciones demoTransacciones = new DemoTransacciones();
+    private final ConsultaProductoJdbc consultaProductoJdbc = new ConsultaProductoJdbc();
 
 
     /** @param inventario colección común de productos de esta ejecución. */
@@ -754,23 +758,30 @@ public class MenuPrincipal {
     private void consultarProducto() 
     {
         System.out.println("\n---------- CONSULTAR PRODUCTO ----------");
+        
         String texto = LectorConsola.leerTexto("Código del producto: ");
         String codigo = ValidadorProducto.normalizarCodigo(texto);
+        
         if (codigo.isEmpty()) 
         {
             System.out.println(ColoresConsola.pintar("[ERROR] el código no puede estar vacío", ColoresConsola.ROJO));
             LectorConsola.pausar();
             return;
         } 
+        
         try 
         {
-            Producto p = productoDAO.buscarPorCodigo(codigo);
-            if (p == null) 
+            // Llamada directa al componente (devuelve Optional)
+            Optional<Producto> optProducto = consultaProductoJdbc.buscarPorCodigo(codigo);
+            
+            if (optProducto.isEmpty()) 
             {
                 System.out.println("No existe ningún producto con el código " + codigo);
             } 
             else 
             {
+                Producto p = optProducto.get();
+                
                 System.out.println("Código: " + p.getCodigo());
                 System.out.println("Nombre: " + p.getNombre());
                 System.out.println("Precio: " + p.getPrecio() + " €");
@@ -808,7 +819,6 @@ public class MenuPrincipal {
         
         LectorConsola.pausar();
     }
-
     private void modificarProducto()
     {
         System.out.println("\n---------- MODIFICAR PRODUCTO ----------");
@@ -1416,9 +1426,60 @@ public class MenuPrincipal {
     {
         System.out.println("\n---------- IMPORTAR JSON ----------");
         String texto = LectorConsola.leerTexto("Digite la Ruta: ");
-        ResultadoImportacion resultado = importadorJson.importar(texto, inventario);
+
+        if (texto == null || texto.trim().isEmpty())
+        {
+            error("la ruta está vacía");
+            return;
+        }
+        Path ruta;
+        try
+        {
+            ruta = Paths.get(texto.trim());
+        }
+        catch (InvalidPathException e)
+        {
+            error("la ruta no es válida");
+            return;
+        }
+        ResultadoLectura lectura = lectorJson.leer(ruta);
+        if (lectura.hayErrorGeneral())
+        {
+            error(lectura.getErrorGeneral());
+            return;
+        }
+
+        ResultadoImportacion resultado = incorporarAlInventario(lectura);
         mostrarResultado(resultado);
         LectorConsola.pausar();
+    }
+
+    private ResultadoImportacion incorporarAlInventario(ResultadoLectura lectura)
+    {
+        ResultadoImportacion resultado = new ResultadoImportacion();
+         // Encontrados: sumarEncontrado() suma de uno en uno; se repite
+        // getEncontrados() veces para no añadir métodos a ResultadoImportacion
+        // (que comparte con el importador XML).
+        for (int i = 0; i < lectura.getEncontrados(); i++)
+        {
+            resultado.sumarEncontrado();
+        }
+        for (String incidencia : lectura.getIncidencias())
+        {
+            resultado.agregarIncidencia(incidencia);
+        }
+        for (Producto producto : lectura.getProductos())
+        {
+            if (inventario.agregar(producto))
+            {
+                resultado.sumarImportado();
+            }
+            else
+            {
+                resultado.agregarIncidencia(producto.getCodigo() + ": ya existe en el inventario");
+            }
+        }
+        return resultado;
     }
 
     private void importarXml()

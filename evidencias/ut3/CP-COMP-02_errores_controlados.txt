@@ -1,0 +1,51 @@
+# CP-COMP-02 · Errores controlados al importar JSON con LectorProductosJson
+# Fecha: 15-11-2026
+# Comando: mvn exec:java → opción 2 (Importar JSON) / opción 4 (Consultar)
+# Entorno: Windows PowerShell, JDK 21
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
+#
+# Objetivo: verificar que el componente LectorProductosJson gestiona errores
+# estructurales (JSON mal formado) y de fichero (inexistente) devolviendo
+# un error general, sin romper la aplicación ni modificar el inventario.
+
+# --- CASO 1: JSON mal formado ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/ejemplos/catalogo_malformado.json
+[ERROR] el fichero contiene un JSON mal formado
+Pulsa Intro para continuar...
+
+# --- CASO 2: Fichero inexistente ---
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/no_existe.json
+[ERROR] el fichero no existe
+Pulsa Intro para continuar...
+
+# --- Verificación: El inventario no ha cambiado ---
+Selecciona una opción: 4
+
+---------- CONSULTA DE PRODUCTOS ----------
+Selecciona una opción: 1
+
+---------- LISTAR PRODUCTOS ----------
+No hay productos en el inventario.
+Pulsa Intro para continuar...
+
+# --- Verificación: La aplicación sigue funcionando ---
+Selecciona una opción: 2
+
+---------- IMPORTAR JSON ----------
+Digite la Ruta: datos/pruebas/rf02/tres_validos.json
+Encontrados: 3
+Importados: 3
+Rechazados: 0
+[OK] Importación finalizada.
+Pulsa Intro para continuar...
+
+# ==========================================
+# CONCLUSIÓN
+# ==========================================
+# 1. El fichero mal formado devuelve error sin lanzar excepciones no controladas.
+# 2. El fichero inexistente devuelve error sin lanzar excepciones no controladas.
+# 3. El inventario se mantiene intacto (0 productos) tras los fallos.
+# 4. La aplicación sigue operativa y permite una importación válida después.
+# 5. El componente encapsula los fallos en el errorGeneral del ResultadoLectura.

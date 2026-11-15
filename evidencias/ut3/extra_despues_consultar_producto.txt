@@ -1,0 +1,89 @@
+# Captura del estado DESPUÉS de la refactorización (UT3) - Consulta de producto
+# Fecha: 14-11-2026
+# Comando: mvn exec:java → opción 7 → opción 5 (o 4) → opción 2
+# Entorno: Windows PowerShell, MySQL 8.0.46, JDK 21
+# Archivo de configuración: src/main/resources/db.properties (local, excluido de Git)
+# 
+# Objetivo: registrar el comportamiento de la búsqueda por código
+# (usando ConsultaProductoJdbc) después de la refactorización.
+
+# --- CASO 1: 7 → 5 → 2, código TEC-001 ---
+---------- CONSULTAS MYSQL ----------
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: TEC-001
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Código: TEC-001
+Nombre: Teclado mecánico
+Precio: 44.90 €
+Stock: 12
+Categoría: 1 - Periféricos
+Proveedor: 1 - PcPartes
+Pulsa Intro para continuar...
+
+# --- CASO 2: 7 → 5 → 2, código tec-001 (minúsculas) ---
+---------- CONSULTAS MYSQL ----------
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: tec-001
+Código: TEC-001
+Nombre: Teclado mecánico
+Precio: 44.90 €
+Stock: 12
+Categoría: 1 - Periféricos
+Proveedor: 1 - PcPartes
+Pulsa Intro para continuar...
+
+# --- CASO 3: 7 → 5 → 2, código ZZZ-999 (inexistente) ---
+---------- CONSULTAS MYSQL ----------
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: ZZZ-999
+No existe ningún producto con el código ZZZ-999
+Pulsa Intro para continuar...
+
+# --- CASO 4: 7 → 5 → 2, solo Intro (vacío) ---
+---------- CONSULTAS MYSQL ----------
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: 
+[ERROR] el código no puede estar vacío
+Pulsa Intro para continuar...
+
+# --- CASO 5: 7 → 5 → 2, código TEC_001 (con guion bajo) ---
+---------- CONSULTAS MYSQL ----------
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: TEC_001
+No existe ningún producto con el código TEC_001
+Pulsa Intro para continuar...
+
+# --- CASO 6: 7 → 4 → 2, código TEC-001 ---
+---------- PRODUCTOS ----------
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: TEC-001
+Código: TEC-001
+Nombre: Teclado mecánico
+Precio: 44.90 €
+Stock: 12
+Categoría: 1 - Periféricos
+Proveedor: 1 - PcPartes
+Pulsa Intro para continuar...
+
+# --- CASO 7: 7 → 4 → 2, código ZZZ-999 (inexistente) ---
+---------- PRODUCTOS ----------
+Selecciona una opción: 2
+
+---------- CONSULTAR PRODUCTO ----------
+Código del producto: ZZZ-999
+No existe ningún producto con el código ZZZ-999
+Pulsa Intro para continuar...

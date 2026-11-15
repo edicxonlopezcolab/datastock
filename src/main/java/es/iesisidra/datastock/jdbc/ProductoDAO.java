@@ -22,32 +22,25 @@ public class ProductoDAO
       + "FROM producto p "
       + "JOIN categoria c ON c.id = p.categoria_id "
       + "JOIN proveedor v ON v.id = p.proveedor_id ";
+
+    private final ConsultaProductoJdbc consultaProductoJdbc = new ConsultaProductoJdbc();
+
     /**
      * Busca un producto por su código.
-     * @param codigo Código exacto del producto (ej. TEC-001).
+     * <p>Delega la consulta en el componente reutilizable {@link ConsultaProductoJdbc}.
+     * Se mantiene este método por compatibilidad con las demás operaciones del DAO
+     * (alta, modificar, eliminar, movimientos y validación de importación).</p>
+     * 
+     * @param codigo Código del producto.
      * @return El producto encontrado, o null si no existe.
-     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     * @throws SQLException Si ocurre un error de SQL.
      */
-    public Producto buscarPorCodigo(String codigo) throws SQLException 
+    public Producto buscarPorCodigo(String codigo) throws SQLException
     {
-        String sql = "SELECT codigo, nombre, precio, stock, categoria_id, proveedor_id FROM producto WHERE codigo = ?";
-
-        try (Connection con = ConexionBD.abrir(); PreparedStatement ps = con.prepareStatement(sql)) 
-        {
-            ps.setString(1, codigo);
-            
-            try (ResultSet rs = ps.executeQuery()) 
-            {
-                if (rs.next()) 
-                {
-                    return crearProducto(rs);
-                }
-            }
-        }
-        return null;
+        return consultaProductoJdbc.buscarPorCodigo(codigo).orElse(null);
     }
 
-        /**
+    /**
      * Inserta un producto en la base de datos.
      * Abre su propia conexión, la usa y la cierra al terminar.
      * Delega el INSERT en la sobrecarga que recibe la conexión.
@@ -196,24 +189,6 @@ public class ProductoDAO
             }
         }
         return lista;
-    }
-
-    /**
-     * Crea un Producto a partir de la fila actual del ResultSet.
-     * @param rs ResultSet posicionado en una fila válida.
-     * @return Producto con los datos de esa fila.
-     * @throws SQLException Si falla la lectura de alguna columna.
-     */
-    private Producto crearProducto(ResultSet rs) throws SQLException 
-    {
-        return new Producto(
-            rs.getString("codigo"),
-            rs.getString("nombre"),
-            rs.getBigDecimal("precio"),
-            rs.getInt("stock"),
-            rs.getInt("categoria_id"),
-            rs.getInt("proveedor_id")
-        );
     }
 
     private ProductoDetalle crearDetalle(ResultSet rs) throws SQLException
