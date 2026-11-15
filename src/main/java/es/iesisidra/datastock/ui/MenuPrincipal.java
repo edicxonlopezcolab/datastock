@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import es.iesisidra.datastock.ficheros.ExploradorRutas;
 import es.iesisidra.datastock.ficheros.ExportadorJson;
@@ -37,6 +38,7 @@ import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.modelo.Proveedor;
 import es.iesisidra.datastock.servicio.ResultadoImportacion;
 import es.iesisidra.datastock.ficheros.ResultadoLectura;
+import es.iesisidra.datastock.jdbc.ConsultaProductoJdbc;
 
 /**
  * Presentación de menús y navegación de la primera fase de DataStock.
@@ -60,6 +62,7 @@ public class MenuPrincipal {
     private final MovimientoDAO movimientoDAO = new MovimientoDAO();
     private final CopiaInventario copiaInventario = new CopiaInventario();
     private final DemoTransacciones demoTransacciones = new DemoTransacciones();
+    private final ConsultaProductoJdbc consultaProductoJdbc = new ConsultaProductoJdbc();
 
 
     /** @param inventario colección común de productos de esta ejecución. */
@@ -755,23 +758,30 @@ public class MenuPrincipal {
     private void consultarProducto() 
     {
         System.out.println("\n---------- CONSULTAR PRODUCTO ----------");
+        
         String texto = LectorConsola.leerTexto("Código del producto: ");
         String codigo = ValidadorProducto.normalizarCodigo(texto);
+        
         if (codigo.isEmpty()) 
         {
             System.out.println(ColoresConsola.pintar("[ERROR] el código no puede estar vacío", ColoresConsola.ROJO));
             LectorConsola.pausar();
             return;
         } 
+        
         try 
         {
-            Producto p = productoDAO.buscarPorCodigo(codigo);
-            if (p == null) 
+            // Llamada directa al componente (devuelve Optional)
+            Optional<Producto> optProducto = consultaProductoJdbc.buscarPorCodigo(codigo);
+            
+            if (optProducto.isEmpty()) 
             {
                 System.out.println("No existe ningún producto con el código " + codigo);
             } 
             else 
             {
+                Producto p = optProducto.get();
+                
                 System.out.println("Código: " + p.getCodigo());
                 System.out.println("Nombre: " + p.getNombre());
                 System.out.println("Precio: " + p.getPrecio() + " €");
@@ -809,7 +819,6 @@ public class MenuPrincipal {
         
         LectorConsola.pausar();
     }
-
     private void modificarProducto()
     {
         System.out.println("\n---------- MODIFICAR PRODUCTO ----------");
