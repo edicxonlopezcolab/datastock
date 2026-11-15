@@ -1,4 +1,4 @@
-# DataStock – UT2
+# DataStock – UT3
 
 **Módulo:** Acceso a Datos · 2.º DAM · IES Isidra de Guzmán · Curso 2026–2027  
 **Lenguaje:** Java 21 · **Construcción:** Maven · **Interfaz:** consola · **Base de datos:** MySQL 8 (JDBC)
@@ -19,9 +19,11 @@
 | RF-JDBC-07 | Importación de memoria a MySQL en una transacción (7.8) | ✅ Completado |
 | RF-JDBC-08 | Demostración de commit y rollback (7.9) | ✅ Completado |
 | SQLite | `DemoSQLite`, gestor embebido (independiente del menú) | ✅ Completado |
+| UT3 | Componentes reutilizables: `LectorProductosJson` (opción 2) y `ConsultaProductoJdbc` (7.5.2 y 7.4.2) | ✅ Completado |
 
 Las pruebas se documentan en `docs/DataStock_UT1_Registro_Pruebas.docx` (52, todas superadas) y
-`docs/DataStock_UT2_Registro_Pruebas.docx` (37, todas superadas). Las salidas de cada una están
+`docs/DataStock_UT2_Registro_Pruebas.docx` (37, todas superadas) y
+`docs/DataStock_UT3_Registro_Pruebas.docx` (6, todas superadas). Las salidas de cada una están
 en `evidencias/`.
 
 ## 1. ¿Qué es este proyecto?
@@ -30,9 +32,9 @@ DataStock es una práctica **individual e integradora** que evoluciona durante t
 
 - **UT1 – Ficheros:** importar JSON/XML, consultar en memoria, exportar, serializar y dos actividades independientes (XPath y `RandomAccessFile`).
 - **UT2 – JDBC:** incorporar MySQL: categorías, proveedores, productos, movimientos de stock con un procedimiento almacenado, importación en una transacción y una actividad comparativa con SQLite.
-- **UT3 – Componentes:** reorganizar el acceso a datos en componentes reutilizables.
+- **UT3 – Componentes:** reorganizar dos operaciones en componentes reutilizables y documentados: la lectura del JSON (`LectorProductosJson`) y la consulta de un producto por código (`ConsultaProductoJdbc`). Ver la sección 14.
 
-Esta versión corresponde a la entrega de la UT2 (etiqueta `UT2-v1.0`). La UT1 sigue funcionando sin cambios (etiqueta `ut1-entrega`).
+Esta versión corresponde a la entrega de la UT3 (etiqueta `UT3-v1.0`). La UT1 (etiqueta `ut1-entrega`) y la UT2 (etiqueta `UT2-v1.0`) siguen funcionando: el comportamiento de las opciones refactorizadas es el mismo.
 
 ## 2. Requisitos previos
 
@@ -155,8 +157,8 @@ DataStock_UT1_Proyecto_Inicial/
 │   ├── pruebas/               # Ficheros de prueba propios (rf01 a rf08 y jdbc07)
 │   ├── sqlite/                # Base SQLite generada por DemoSQLite (no se sube)
 │   └── salidas/               # Exportaciones y binarios generados (no se suben)
-├── docs/                      # Registros de pruebas UT1 y UT2 (Word y PDF)
-├── evidencias/                # Salidas de cada prueba (rfXX/, jdbcXX/ y sqlite/)
+├── docs/                      # Registros de pruebas UT1, UT2 y UT3 (Word y PDF)
+├── evidencias/                # Salidas de cada prueba (rfXX/, jdbcXX/, sqlite/ y ut3/)
 ├── material_referencia/       # Script SQL y diagrama entidad-relación
 └── src/main/
     ├── resources/
@@ -171,6 +173,8 @@ DataStock_UT1_Proyecto_Inicial/
         ├── validacion/
         │   └── ValidadorProducto.java       # Reglas comunes (JSON, XML, .dat y MySQL)
         ├── ficheros/                        # UT1: exploración, importadores, exportadores, serialización
+        │   ├── LectorProductosJson.java     # UT3: lee y valida el JSON (antes ImportadorJson)
+        │   └── ResultadoLectura.java        # UT3: resultado de la lectura (sin consola ni inventario)
         ├── jdbc/                            # UT2: acceso a MySQL, sin consola
         │   ├── ComprobadorConexion.java     # RF-JDBC-01
         │   ├── InfoConexion.java
@@ -178,6 +182,7 @@ DataStock_UT1_Proyecto_Inicial/
         │   ├── CategoriaDAO.java            # RF-JDBC-02
         │   ├── ProveedorDAO.java            # RF-JDBC-02
         │   ├── ProductoDAO.java             # RF-JDBC-03 y RF-JDBC-04
+        │   ├── ConsultaProductoJdbc.java    # UT3: consulta por código (Optional<Producto>)
         │   ├── ProductoDetalle.java         # DTO del JOIN producto-categoría-proveedor
         │   ├── MovimientoDAO.java           # RF-JDBC-05 y RF-JDBC-06
         │   ├── CopiaInventario.java         # RF-JDBC-07
@@ -298,7 +303,8 @@ DataStock es una aplicación de consola de un solo usuario y sus operaciones son
 
 - `docs/DataStock_UT1_Registro_Pruebas.docx` y `.pdf`: 52 pruebas de la UT1.
 - `docs/DataStock_UT2_Registro_Pruebas.docx` y `.pdf`: 37 pruebas de la UT2 (CP-JDBC-01 a 20, CP-JDBC-01b, CP-SQLITE-01 a 03 y 13 pruebas adicionales EX-JDBC).
-- `evidencias/`: la salida de cada prueba. Cada fichero lleva el identificador de la prueba como nombre (`CP-JDBC-12_entrada.txt`) y los extras empiezan por `extra_`. Las carpetas `jdbc01` a `jdbc08` corresponden a RF-JDBC-01 a 08 y `sqlite` a la actividad comparativa.
+- `docs/DataStock_UT3_Registro_Pruebas.docx` y `.pdf`: 6 pruebas de la UT3 (CP-COMP-01 a 03 y EX-COMP-01 a 03).
+- `evidencias/`: la salida de cada prueba. Cada fichero lleva el identificador de la prueba como nombre (`CP-JDBC-12_entrada.txt`) y los extras empiezan por `extra_`. Las carpetas `jdbc01` a `jdbc08` corresponden a RF-JDBC-01 a 08, `sqlite` a la actividad comparativa y `ut3` a los componentes de la UT3.
 - `datos/pruebas/jdbc07/`: ficheros de la importación (`ut2_importacion_mixta.json` y `ut2_fallo_forzado.json`) y el script del trigger temporal con el que se fuerza el fallo del CP-JDBC-18.
 
 ## 12. Reglas clave del enunciado
@@ -319,6 +325,19 @@ DataStock es una aplicación de consola de un solo usuario y sus operaciones son
 - **Aviso de SLF4J al ejecutar `DemoSQLite`** («Failed to load class StaticLoggerBinder»): es informativo. El driver busca un logger y usa uno nulo; no afecta al resultado.
 - **Consola de Windows:** para ver correctamente el símbolo € hay que ejecutar `chcp 65001` y después `mvn exec:java` en la misma terminal. El botón Run del IDE abre una terminal nueva que no conserva ese ajuste.
 - **Hora de los movimientos:** la fecha de `movimiento_stock` la pone MySQL con la zona horaria de su servidor, por lo que puede variar entre dos equipos con servidores configurados de forma distinta.
+
+## 14. UT3: componentes reutilizables
+
+**Qué ha cambiado.** Se han refactorizado dos operaciones del menú, sin cambiar lo que ve el usuario:
+
+- **Opción 2 (importar JSON):** la lectura y validación del fichero está ahora en `LectorProductosJson`, que devuelve un `ResultadoLectura` con los productos válidos, las incidencias y, si el fichero no se puede procesar, un error general. El componente no imprime nada ni conoce el `Inventario`: es el menú (`importarJson()` e `incorporarAlInventario()`) quien añade los productos y muestra el resultado.
+- **Opción 7 → 5 → 2 (consultar producto por código):** la consulta está en `ConsultaProductoJdbc.buscarPorCodigo()`, que devuelve un `Optional<Producto>` y deja subir la `SQLException`. La opción 7 → 4 → 2 usa el mismo método, y `ProductoDAO.buscarPorCodigo()` delega en él para el resto de operaciones (alta, modificar, eliminar y movimientos).
+
+**Separar la lectura del JSON del menú.** La ventaja es que el lector se puede reutilizar y probar sin consola ni inventario, y que el menú decide qué hacer con los datos (por ejemplo, rechazar un código que ya existe). El coste es una clase más (`ResultadoLectura`) y que el menú tiene que traspasar su contenido al `ResultadoImportacion` que ya usaba, con algo más de código que antes.
+
+**Separar JDBC de la consola.** `ConsultaProductoJdbc` no imprime ni captura la excepción: el menú la traduce con `ErroresSQL.explicar` y la muestra en rojo. Así el componente se podría usar desde otra interfaz (una ventana o una API) sin arrastrar la consola, y el mensaje al usuario se decide en un solo sitio. Se comprueba con el servidor MySQL detenido en `evidencias/ut3/extra_consulta_servidor_detenido.txt`.
+
+**Herramientas.** El IDE se ha usado para renombrar y mover clases, Maven para compilar y ejecutar (`mvn -q clean compile`, `mvn exec:java`), y Javadoc, generado con `mvn javadoc:javadoc` (salida en `target/site/apidocs`, que no se sube; hay una captura en `evidencias/ut3/extra_javadoc.png`). Las pruebas manuales están registradas en `docs/DataStock_UT3_Registro_Pruebas.docx` y se compararon antes y después de refactorizar (`evidencias/ut3/extra_antes_*` y `extra_despues_*`) sin diferencias en el comportamiento. No se han añadido pruebas automáticas con JUnit.
 
 ## Decisiones de diseño de la UT1
 
@@ -343,7 +362,7 @@ DataStock es una aplicación de consola de un solo usuario y sus operaciones son
   o un error general si el documento no puede procesarse. El menú se encarga
   de mostrarlo, con `[OK]` en verde y `[ERROR]` en rojo, mediante un único
   método común para JSON y XML.
-- **RF-FIC-02:** `ImportadorJson` lee el documento completo con Gson antes de
+- **RF-FIC-02:** `ImportadorJson` (en la UT3 renombrado y refactorizado como `LectorProductosJson`, ver sección 14) lee el documento completo con Gson antes de
   tocar el inventario. Si el JSON está mal formado o no tiene el array
   `productos`, se rechaza entero. Los productos válidos se guardan primero en
   una lista temporal y solo al final se añaden al inventario. Los códigos
@@ -355,7 +374,7 @@ DataStock es una aplicación de consola de un solo usuario y sus operaciones son
   para no escribir errores por consola. La lectura de cada producto, la
   validación y el alta en el inventario siguen el mismo esquema que en JSON.
   Las comprobaciones de ruta y el procesamiento de productos están repetidos en
-  los dos importadores; extraerlos a un componente común queda previsto para UT3.
+  los dos importadores. En la UT3 se ha separado la lectura del JSON (sección 14); la del XML conserva esa parte repetida y queda como mejora futura.
 - **RF-FIC-04:** las búsquedas y el listado están en `Inventario`, que devuelve
   resultados sin imprimir. `listarOrdenado()` ordena una **copia** con
   `Comparator.comparing(Producto::getCodigo)`, de modo que consultar no altera
@@ -370,7 +389,7 @@ DataStock es una aplicación de consola de un solo usuario y sus operaciones son
   que también usa el guardado del `.dat`. No hay conversor directo JSON↔XML:
   el modelo intermedio es la colección Java. Los métodos de exportación del
   menú son casi iguales; unificarlos mediante una interfaz común queda previsto
-  para UT3.
+  como mejora futura.
 - **RF-FIC-06:** `SerializadorInventario` guarda una copia de la lista con
   `ObjectOutputStream` y la recupera con `ObjectInputStream`. Al recuperar se
   comprueba que el objeto leído es una lista, que cada elemento es un `Producto`
