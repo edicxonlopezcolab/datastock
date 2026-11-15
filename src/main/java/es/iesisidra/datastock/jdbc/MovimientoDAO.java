@@ -12,6 +12,17 @@ import java.util.List;
 import es.iesisidra.datastock.config.ConexionBD;
 import es.iesisidra.datastock.modelo.MovimientoStock;
 
+/**
+ * Acceso a la tabla movimiento_stock de MySQL y al procedimiento
+ * almacenado registrar_movimiento (RF-JDBC-05 y RF-JDBC-06).
+ * <p>Los movimientos no se insertan directamente: los registra el procedimiento,
+ * que actualiza el stock del producto y guarda el stock anterior y posterior
+ * dentro de la misma operación. Las consultas devuelven los movimientos
+ * ordenados cronológicamente.</p>
+ * <p>Cada método abre su propia conexión con {@link ConexionBD#abrir()} y la
+ * cierra al terminar. No imprime nada: devuelve datos o lanza
+ * {@link SQLException}, y es el menú quien la traduce a un mensaje.</p>
+ */
 public class MovimientoDAO
 {
     public void registrar(String codigo, String tipo, int cantidad) throws SQLException
